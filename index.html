@@ -14,21 +14,29 @@
 
 <style>
 :root{
-    --gold: #c59b2a;
-    --gold-dark: #9b7617;
-    --gold-light: #f7efd6;
-    --primary: #0f172a;
+    /* TURQUOISE & METALLIC GOLD PALETTE */
+    --primary: #0f766e;          /* Deep Turquoise */
+    --primary-dark: #115e59;     /* Darker Turquoise */
+    --primary-light: #ccfbf1;    /* Light Turquoise Soft */
+    --primary-bg: #f0fdf4;       /* Subtle Turquoise/Green Tint Background */
+    
+    --gold: #d97706;             /* Base Gold */
+    --gold-dark: #b45309;        /* Dark Metallic Gold */
+    --gold-light: #fef3c7;       /* Light Soft Gold */
+    --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); /* Metallic Gold Gradient */
+    --gold-btn-gradient: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    
     --bg: #f8fafc;
     --white: #ffffff;
-    --text: #334155;
+    --text: #1e293b;
     --text-light: #64748b;
-    --border: #e2e8f0;
+    --border: #cbd5e1;
     --danger: #ef4444;
     --danger-dark: #dc2626;
     --success: #10b981;
     --sidebar-width: 260px;
     --radius: 12px;
-    --shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+    --shadow: 0 4px 20px -2px rgba(15, 118, 110, 0.08);
 }
 
 *{
@@ -42,6 +50,115 @@ body{
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+}
+
+/* =========================================================
+   LOGIN OVERLAY / ADMIN GATE
+========================================================= */
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--white);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    padding: 36px 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    text-align: center;
+    border: 2px solid #d97706;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--gold-gradient);
+}
+
+.login-logo {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 800;
+    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.3);
+}
+
+.login-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.login-subtitle {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+.login-card .form-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.login-card label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--gold-gradient);
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(180, 83, 9, 0.35);
+}
+
+.login-error {
+    color: var(--danger-dark);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    display: none;
+    background: #fee2e2;
+    padding: 8px;
+    border-radius: 6px;
 }
 
 .app{
@@ -61,6 +178,8 @@ body{
     padding: 24px 16px;
     z-index: 50;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .logo-area{
@@ -71,40 +190,40 @@ body{
 }
 
 .logo-circle{
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
     margin: 0 auto 12px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold-light), #fff);
-    border: 2px solid var(--gold);
-    color: var(--gold-dark);
+    background: var(--gold-gradient);
+    color: #0f172a;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
 }
 
 .logo-title{
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    color: var(--primary);
+    color: var(--primary-dark);
 }
 
 .logo-subtitle{
-    margin-top: 2px;
+    margin-top: 3px;
     font-size: 10px;
-    color: var(--text-light);
+    color: var(--gold-dark);
     letter-spacing: 1px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .nav{
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1;
 }
 
 .nav button{
@@ -131,15 +250,38 @@ body{
 }
 
 .nav button:hover{
-    background: var(--bg);
-    color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary-dark);
     transform: translateX(4px);
 }
 
 .nav button.active{
-    background: var(--gold-light);
-    color: var(--gold-dark);
+    background: var(--primary);
+    color: var(--white);
     font-weight: 700;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+
+.logout-btn {
+    margin-top: auto;
+    border: 1px solid #fee2e2;
+    background: #fef2f2;
+    color: var(--danger-dark);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: var(--danger);
+    color: var(--white);
 }
 
 /* MAIN CONTENT */
@@ -170,7 +312,7 @@ body{
 .page-header h1{
     font-size: 26px;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--primary-dark);
 }
 
 .page-header p{
@@ -206,6 +348,16 @@ body{
     align-items: center;
     gap: 16px;
     transition: transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background: var(--gold-gradient);
 }
 
 .stat-card:hover{ transform: translateY(-3px); }
@@ -214,8 +366,8 @@ body{
     width: 48px;
     height: 48px;
     border-radius: 10px;
-    background: var(--gold-light);
-    color: var(--gold-dark);
+    background: var(--primary-light);
+    color: var(--primary-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,13 +375,13 @@ body{
 }
 
 .stat-label{ color: var(--text-light); font-size: 12px; font-weight: 600; }
-.stat-value{ font-size: 20px; font-weight: 800; color: var(--primary); margin-top: 2px; }
+.stat-value{ font-size: 20px; font-weight: 800; color: var(--primary-dark); margin-top: 2px; }
 
 /* FORMS & INPUTS */
 .form-grid{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .form-grid-3{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .form-group{ margin-bottom: 12px; }
-.form-group label{ display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--primary); }
+.form-group label{ display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--primary-dark); }
 
 input, select, textarea{
     width: 100%;
@@ -244,8 +396,8 @@ input, select, textarea{
 }
 
 input:focus, select:focus, textarea:focus{
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(197, 155, 42, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
 }
 
 textarea{ min-height: 80px; resize: vertical; }
@@ -259,6 +411,7 @@ textarea{ min-height: 80px; resize: vertical; }
     font-size: 12px;
     font-weight: 700;
     margin-bottom: 16px;
+    border-left: 4px solid var(--gold);
 }
 .edit-label.show { display: block; }
 
@@ -276,9 +429,13 @@ textarea{ min-height: 80px; resize: vertical; }
     transition: all 0.2s ease;
 }
 
-.btn-gold{ background: var(--gold); color: #fff; }
-.btn-gold:hover{ background: var(--gold-dark); transform: translateY(-1px); }
-.btn-secondary{ background: #e2e8f0; color: var(--primary); }
+.btn-gold{ background: var(--gold-btn-gradient); color: #fff; box-shadow: 0 2px 8px rgba(180, 83, 9, 0.2); }
+.btn-gold:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3); }
+
+.btn-primary{ background: var(--primary); color: #fff; }
+.btn-primary:hover{ background: var(--primary-dark); transform: translateY(-1px); }
+
+.btn-secondary{ background: #e2e8f0; color: var(--text); }
 .btn-secondary:hover{ background: #cbd5e1; }
 .btn-danger{ background: var(--danger); color: #fff; }
 .btn-danger:hover{ background: var(--danger-dark); }
@@ -297,13 +454,13 @@ textarea{ min-height: 80px; resize: vertical; }
 }
 
 .btn-edit{ background: var(--gold-light); color: var(--gold-dark); }
-.btn-slip{ background: #e0f2fe; color: #0369a1; }
+.btn-slip{ background: var(--primary-light); color: var(--primary-dark); }
 .btn-delete{ background: #fee2e2; color: #b91c1c; }
 
 /* TABLES */
 .table-wrap{ width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
 table{ width: 100%; border-collapse: collapse; min-width: 600px; }
-thead th{ background: #f8fafc; color: var(--primary); text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); }
+thead th{ background: var(--primary-bg); color: var(--primary-dark); text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--border); }
 tbody td{ padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
 tbody tr:hover{ background: #f1f5f9; }
 
@@ -334,9 +491,9 @@ tbody tr:hover{ background: #f1f5f9; }
 }
 
 .att-header-cyan {
-    background-color: #00ffff !important;
+    background-color: #99f6e4 !important;
     font-weight: bold;
-    color: #000;
+    color: #0f766e;
 }
 
 .att-cell-editable {
@@ -347,8 +504,8 @@ tbody tr:hover{ background: #f1f5f9; }
 }
 
 .att-cell-editable:focus {
-    background-color: #e0f2fe;
-    box-shadow: inset 0 0 0 2px #0284c7;
+    background-color: #ccfbf1;
+    box-shadow: inset 0 0 0 2px #0f766e;
 }
 
 /* PALET WARNA STATUS CUTI/OFF */
@@ -357,7 +514,7 @@ tbody tr:hover{ background: #f1f5f9; }
 .status-public { background-color: #ffc000 !important; color: #000; font-weight: bold; }
 .status-el { background-color: #00b0f0 !important; color: #fff; font-weight: bold; }
 .status-ctg { background-color: #ed7d31 !important; color: #fff; font-weight: bold; }
-.status-grey { background-color: #b7b7b7 !important; color: transparent !important; font-weight: normal; }
+.status-grey { background-color: #b7b7b7 !important; color: #1e293b !important; font-weight: bold; }
 
 .color-palette {
     display: flex;
@@ -381,28 +538,28 @@ tbody tr:hover{ background: #f1f5f9; }
 
 /* PAYSLIP DESIGN */
 .payslip-wrapper{ max-width: 820px; margin: auto; }
-.payslip{ background: #fff; border: 2px solid var(--primary); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); color: #1e293b; font-size: 13px; }
-.payslip-header-table { width:100%; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; }
-.company-title { font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin:0; }
+.payslip{ background: #fff; border: 2px solid var(--primary-dark); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); color: #1e293b; font-size: 13px; }
+.payslip-header-table { width:100%; border-bottom: 2px solid var(--primary-dark); padding-bottom: 12px; margin-bottom: 20px; }
+.company-title { font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--primary-dark); margin:0; }
 .company-sub { font-size: 11px; color: var(--text-light); margin-top: 4px; line-height: 1.4; }
-.slip-badge { text-align: right; font-size: 18px; font-weight: 800; color: #2563eb; text-transform: uppercase; white-space: nowrap; }
+.slip-badge { text-align: right; font-size: 18px; font-weight: 800; color: var(--gold-dark); text-transform: uppercase; white-space: nowrap; }
 
 .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
 .info-table td { padding: 5px 6px; font-size: 12px; }
 .info-table td.lbl { font-weight: 600; color: var(--text-light); width: 16%; }
-.info-table td.val { font-weight: 700; color: var(--primary); width: 34%; }
+.info-table td.val { font-weight: 700; color: var(--primary-dark); width: 34%; }
 
 .breakdown-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
-.breakdown-table th { color: var(--text-light); padding: 8px; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); background-color: #f8fafc; }
+.breakdown-table th { color: var(--primary-dark); padding: 8px; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); background-color: var(--primary-bg); }
 .breakdown-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
 .breakdown-table td.amount { text-align: right; font-weight: 600; padding-right: 12px; }
 
 .total-bar-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
-.total-bar-table td { padding: 10px 8px; font-weight: 800; font-size: 12px; color: var(--primary); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); background-color: #f8fafc; }
+.total-bar-table td { padding: 10px 8px; font-weight: 800; font-size: 12px; color: var(--primary-dark); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); background-color: var(--primary-bg); }
 
 .net-pay-box {
-    background-color: #f0fdf4;
-    border: 2px dashed #16a34a;
+    background-color: var(--primary-bg);
+    border: 2px dashed var(--primary);
     border-radius: 8px;
     padding: 14px 20px;
     margin-top: 15px;
@@ -411,8 +568,8 @@ tbody tr:hover{ background: #f1f5f9; }
     justify-content: space-between;
     align-items: center;
 }
-.net-pay-title { font-size: 14px; font-weight: 800; color: #15803d; }
-.net-pay-value { font-size: 18px; font-weight: 800; color: #15803d; }
+.net-pay-title { font-size: 14px; font-weight: 800; color: var(--primary-dark); }
+.net-pay-value { font-size: 20px; font-weight: 800; color: var(--gold-dark); }
 .payslip-footer-text { margin-top: 15px; font-size: 11px; color: var(--text-light); text-align: center; font-style: italic; border-top: 1px solid var(--border); padding-top: 10px; }
 
 .print-row{ display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
@@ -424,14 +581,14 @@ tbody tr:hover{ background: #f1f5f9; }
 .spinner{ width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite; }
 @keyframes spin{ to{ transform: rotate(360deg); } }
 
-.toast{ position: fixed; right: 24px; bottom: 24px; background: var(--primary); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transform: translateY(15px); transition: all 0.3s ease; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.toast{ position: fixed; right: 24px; bottom: 24px; background: var(--primary-dark); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transform: translateY(15px); transition: all 0.3s ease; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 .toast.show{ opacity: 1; transform: translateY(0); }
 .toast.success{ background: var(--success); }
 .toast.error{ background: var(--danger); }
 
 @media (max-width: 900px){
     .sidebar{ width: 70px; padding: 16px 8px; }
-    .logo-title, .logo-subtitle, .nav button span{ display: none; }
+    .logo-title, .logo-subtitle, .nav button span, .logout-btn span{ display: none; }
     .main{ margin-left: 70px; width: calc(100% - 70px); padding: 20px; }
     .nav button{ justify-content: center; padding: 12px; }
     .nav button i{ font-size: 18px; width: auto; }
@@ -451,7 +608,7 @@ tbody tr:hover{ background: #f1f5f9; }
 @page { size: A4 portrait; margin: 8mm; }
 @media print{
     html, body { background: #fff; height: 100%; overflow: hidden; }
-    .sidebar, .page-header, .print-row, .no-print{ display: none !important; }
+    .sidebar, .page-header, .print-row, .no-print, .login-overlay{ display: none !important; }
     .main{ margin: 0; width: 100%; padding: 0; }
     .page{ display: none !important; }
     #payslipPage{ display: block !important; opacity: 1 !important; transform: none !important; }
@@ -462,13 +619,31 @@ tbody tr:hover{ background: #f1f5f9; }
 </head>
 <body>
 
+<!-- LOG MASUK ADMIN OVERLAY -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <div class="login-logo">ED</div>
+        <div class="login-title">EMPIRE DAIE EJAY COLLECTION</div>
+        <div class="login-subtitle">PAYROLL MANAGEMENT ADMIN LOGIN</div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Kata Laluan Admin / PIN</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan Kata Laluan" required autofocus>
+            </div>
+            <button type="submit" class="login-btn"><i class="fa-solid fa-right-to-bracket"></i> LOG MASUK</button>
+            <div id="loginError" class="login-error"><i class="fa-solid fa-circle-exclamation"></i> Kata laluan salah! Sila cuba lagi.</div>
+        </form>
+    </div>
+</div>
+
 <div class="app">
     <!-- SIDEBAR -->
     <aside class="sidebar no-print">
         <div class="logo-area">
             <div class="logo-circle">ED</div>
             <div class="logo-title">EMPIRE DAIE EJAY COLLECTION</div>
-            <div class="logo-subtitle">PAYROLL MANAGEMENT</div>
+            <div class="logo-subtitle">PAYROLL SYSTEM</div>
         </div>
         <nav class="nav">
             <button class="active" onclick="showPage('dashboard',this)">
@@ -493,6 +668,10 @@ tbody tr:hover{ background: #f1f5f9; }
                 <i class="fa-solid fa-gear"></i><span>Tetapan</span>
             </button>
         </nav>
+        
+        <button class="logout-btn" onclick="logoutAdmin()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log Keluar</span>
+        </button>
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -529,7 +708,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
                     <div>
-                        <div class="stat-label">Bulan Terkini</div>
+                        <div class="stat-label">Bulan Paparan</div>
                         <div class="stat-value" id="statMonth">-</div>
                     </div>
                 </div>
@@ -551,7 +730,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <div class="table-wrap">
                     <table>
                         <thead>
-                            <tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Bersih</th><th>Tindakan</th></tr>
+                            <tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Bersih</th><th>Catatan</th><th>Tindakan</th></tr>
                         </thead>
                         <tbody id="dashboardPayrollTable"></tbody>
                     </table>
@@ -611,11 +790,11 @@ tbody tr:hover{ background: #f1f5f9; }
                 </div>
 
                 <div class="form-group" style="margin-top:12px;">
-                    <label><i class="fa-solid fa-note-sticky"></i> Catatan</label>
-                    <textarea id="payNotes" placeholder="Contoh: Staf baru masuk 5 hari, cuti, pelarasan gaji, bonus khas, dan lain-lain."></textarea>
+                    <label><i class="fa-solid fa-note-sticky"></i> Catatan (Kesan Staf Baru / Berhenti dll)</label>
+                    <textarea id="payNotes" placeholder="Contoh: Staf baru masuk 15hb, cuti kecemasan, pelarasan gaji, staf berhenti akhir bulan, dan lain-lain."></textarea>
                 </div>
 
-                <div class="summary-box" style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:20px;">
+                <div class="summary-box" style="background:var(--primary-bg); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:20px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Jumlah OT</span><strong id="summaryOT">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Bonus</span><strong id="summaryBonus">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Elaun</span><strong id="summaryAllowance">RM 0.00</strong></div>
@@ -635,12 +814,12 @@ tbody tr:hover{ background: #f1f5f9; }
         <!-- ATTENDANCE GRID (EXCEL FORMAT 1-31 KOTAK EDITABLE) -->
         <section id="attendance" class="page">
             <div class="page-header">
-                <h1 style="color:#10b981; font-family:serif; text-align:center; font-size:32px;">Attend. Logs</h1>
+                <h1 style="color:var(--primary-dark); text-align:center; font-size:30px;">Attend. Logs</h1>
             </div>
 
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-                    <div style="font-weight:700; font-size:14px; color:#10b981;">
+                    <div style="font-weight:700; font-size:14px; color:var(--primary-dark);">
                         Date : <input type="month" id="attMonthFilter" onchange="renderAttendanceGrid()" style="width:160px; display:inline-block; padding:4px 8px;">
                     </div>
                     <div class="btn-row" style="margin-top:0;">
@@ -687,7 +866,7 @@ tbody tr:hover{ background: #f1f5f9; }
                     <div class="form-group"><label>No. IC</label><input type="text" id="staffIC" placeholder="Contoh: 900101-01-1234"></div>
                     <div class="form-group"><label>Jawatan</label><input type="text" id="staffPosition" placeholder="Jawatan"></div>
                     <div class="form-group"><label>Gaji Bulanan (RM)</label><input type="number" id="staffSalary" step="0.01" min="0"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>Catatan Staf</label><textarea id="staffNotes" rows="3" placeholder="Contoh: Last berkhidmat 30/09/2026"></textarea></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>Catatan Staf (Status Berkhidmat / Baharu / Berhenti)</label><textarea id="staffNotes" rows="3" placeholder="Contoh: Mula berkhidmat 01/02/2026 atau Berhenti 30/09/2026"></textarea></div>
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-gold" id="staffSaveBtn" onclick="addStaff()"><i class="fa-solid fa-user-plus"></i> Simpan Staf</button>
@@ -710,7 +889,7 @@ tbody tr:hover{ background: #f1f5f9; }
         <section id="history" class="page">
             <div class="page-header">
                 <h1>Sejarah Gaji</h1>
-                <p>Semak rekod slip gaji lampau</p>
+                <p>Semak rekod slip gaji lampau dan catatan status staf</p>
             </div>
             <div class="card">
                 <div class="filter-row" style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
@@ -723,7 +902,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <div id="historyCount" class="history-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">Jumlah rekod dipaparkan: 0 | Jumlah rekod gaji: 0</div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Kasar</th><th>Potongan</th><th>Gaji Bersih</th><th>Tindakan</th></tr></thead>
+                        <thead><tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Kasar</th><th>Potongan</th><th>Gaji Bersih</th><th>Catatan</th><th>Tindakan</th></tr></thead>
                         <tbody id="historyTable"></tbody>
                     </table>
                 </div>
@@ -738,7 +917,7 @@ tbody tr:hover{ background: #f1f5f9; }
             </div>
             <div class="card">
                 <div class="import-box" style="text-align:center; padding:20px;">
-                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; color:var(--gold); margin-bottom:12px;"></i>
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; color:var(--gold-dark); margin-bottom:12px;"></i>
                     <h3>Pilih Fail Excel</h3>
                     <p style="color:var(--text-light); font-size:13px; margin-top:4px;">Pastikan kolum mengandungi: <b>Nama, IC, Jawatan, Gaji</b></p>
                     <input type="file" id="excelFile" accept=".xlsx,.xls" style="margin-top:20px; max-width:360px;">
@@ -860,7 +1039,7 @@ tbody tr:hover{ background: #f1f5f9; }
                         <div class="net-pay-value" id="slipNet">RM 0.00</div>
                     </div>
 
-                    <div id="slipNotesBox" style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:#f8fafc; font-size:11px;">
+                    <div id="slipNotesBox" style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--primary-bg); font-size:11px;">
                         <strong>Catatan:</strong> <span id="slipNotes">-</span>
                     </div>
 
@@ -882,7 +1061,7 @@ tbody tr:hover{ background: #f1f5f9; }
 <div id="loading" class="loading">
     <div class="loading-box">
         <div class="spinner"></div>
-        <div id="loadingText" style="font-weight:600; font-size:14px; color:var(--primary);">Memproses...</div>
+        <div id="loadingText" style="font-weight:600; font-size:14px; color:var(--primary-dark);">Memproses...</div>
     </div>
 </div>
 
@@ -892,6 +1071,10 @@ tbody tr:hover{ background: #f1f5f9; }
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztfRgz_iCkC7Glid6CYznBkm7e-ZKfRYXhV8SO4Prkl2PtnezrcFHQDgZO-lVB1xwg1w/exec";
 
+// ADMIN PASSWORD CONFIGURATION
+const ADMIN_PASS = "admin123";
+const ADMIN_PIN = "1234";
+
 let staff = [];
 let payroll = [];
 let attendance = [];
@@ -900,6 +1083,43 @@ let editingPayrollId = null;
 let editingStaffId = null;
 
 let selectedStatusMode = "CLEAR";
+
+/* =========================================================
+   LOG MASUK / LOG OUT FUNCTIONALITY
+========================================================= */
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem("edec_admin_logged");
+    const overlay = document.getElementById("loginOverlay");
+    if(isLoggedIn === "true") {
+        overlay.style.display = "none";
+    } else {
+        overlay.style.display = "flex";
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const inputPass = document.getElementById("loginPassword").value.trim();
+    const errorMsg = document.getElementById("loginError");
+
+    if(inputPass === ADMIN_PASS || inputPass === ADMIN_PIN) {
+        localStorage.setItem("edec_admin_logged", "true");
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("loginPassword").value = "";
+        errorMsg.style.display = "none";
+        showToast("Log Masuk Berjaya!", "success");
+    } else {
+        errorMsg.style.display = "block";
+    }
+}
+
+function logoutAdmin() {
+    if(confirm("Adakah anda pasti untuk Log Keluar?")) {
+        localStorage.removeItem("edec_admin_logged");
+        checkAuth();
+        showToast("Anda telah log keluar.", "success");
+    }
+}
 
 async function api(action, data = {}) {
     try {
@@ -946,10 +1166,10 @@ async function loadAllData() {
         if(companyName) companyName.value = settings.company;
         if(companyAddress) companyAddress.value = settings.address;
 
-        updateDashboard();
         renderStaff();
         populateStaffSelect();
         populateFilterSelects();
+        renderDashboardPayroll();
         renderHistory();
         renderAttendanceGrid();
         updateHistoryCount();
@@ -1074,21 +1294,6 @@ function showPage(pageId, button) {
     if(pageId === "dashboard") renderDashboardPayroll();
 }
 
-function updateDashboard() {
-    document.getElementById("statStaff").textContent = staff.length;
-    document.getElementById("statPayroll").textContent = payroll.length;
-    const totalNet = payroll.reduce((sum, r) => sum + Number(r.net || 0), 0);
-    document.getElementById("statNet").textContent = money(totalNet);
-
-    let latestMonth = "";
-    payroll.forEach(r => {
-        const m = normalizeMonth(r.month);
-        if(m && (!latestMonth || m > latestMonth)) latestMonth = m;
-    });
-    document.getElementById("statMonth").textContent = latestMonth ? formatMonth(latestMonth) : "-";
-    renderDashboardPayroll();
-}
-
 function renderDashboardPayroll() {
     const table = document.getElementById("dashboardPayrollTable");
     if(!table) return;
@@ -1105,6 +1310,34 @@ function renderDashboardPayroll() {
 
     filtered.sort((a,b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
 
+    // KEMASKINI STATS BOX DI ATAS BERDASARKAN FILTER/DATA TERPILIH
+    const statStaffElem = document.getElementById("statStaff");
+    const statPayrollElem = document.getElementById("statPayroll");
+    const statNetElem = document.getElementById("statNet");
+    const statMonthElem = document.getElementById("statMonth");
+
+    if (selectedStaff || selectedMonth) {
+        let uniqueStaffIds = new Set(filtered.map(r => String(r.staffId).trim()));
+        let totalNetFiltered = filtered.reduce((sum, r) => sum + Number(r.net || 0), 0);
+
+        if (statStaffElem) statStaffElem.textContent = selectedStaff ? (filtered.length > 0 ? 1 : 0) : uniqueStaffIds.size;
+        if (statPayrollElem) statPayrollElem.textContent = filtered.length;
+        if (statNetElem) statNetElem.textContent = money(totalNetFiltered);
+        if (statMonthElem) statMonthElem.textContent = selectedMonth ? formatMonth(selectedMonth) : "Filtered";
+    } else {
+        if (statStaffElem) statStaffElem.textContent = staff.length;
+        if (statPayrollElem) statPayrollElem.textContent = payroll.length;
+        const totalNetAll = payroll.reduce((sum, r) => sum + Number(r.net || 0), 0);
+        if (statNetElem) statNetElem.textContent = money(totalNetAll);
+
+        let latestMonth = "";
+        payroll.forEach(r => {
+            const m = normalizeMonth(r.month);
+            if(m && (!latestMonth || m > latestMonth)) latestMonth = m;
+        });
+        if (statMonthElem) statMonthElem.textContent = latestMonth ? formatMonth(latestMonth) : "-";
+    }
+
     if(filtered.length === 0) {
         table.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod gaji dijumpai.</td></tr>`;
         return;
@@ -1117,6 +1350,7 @@ function renderDashboardPayroll() {
             <td>${escapeHtml(r.name || "-")}</td>
             <td>${escapeHtml(r.position || "-")}</td>
             <td><strong>${money(r.net)}</strong></td>
+            <td style="max-width:200px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(r.notes || "-")}</td>
             <td>
                 <button class="btn-small btn-edit" onclick="editPayroll('${escapeJs(r.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
                 <button class="btn-small btn-slip" onclick="showPayslip('${escapeJs(r.id)}')"><i class="fa-solid fa-file-invoice"></i> Slip</button>
@@ -1393,7 +1627,7 @@ function handleCellClick(cell) {
         cell.innerText = "CTG";
     } else if(selectedStatusMode === 'Grey') {
         cell.classList.add("status-grey");
-        cell.innerText = "";
+        cell.innerText = "null"; // LANGSUNG MELETAKKAN TEKS "null" DI SEL PADA WAKTU KLIK
     } else if(selectedStatusMode === 'Clear') {
         cell.innerText = "";
     }
@@ -1406,12 +1640,39 @@ function renderAttendanceGrid() {
     const currentMonth = document.getElementById("attMonthFilter")?.value || getCurrentMonth();
     let html = "";
 
-    if(staff.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="31" style="padding:20px; color:var(--text-light);">Tiada rekod staf berdaftar.</td></tr>`;
+    const monthPayrollRecords = payroll.filter(r => normalizeMonth(r.month) === currentMonth);
+    const monthAttendanceRecords = attendance.filter(a => normalizeMonth(a.date) === currentMonth);
+
+    const activeStaffIds = new Set([
+        ...monthPayrollRecords.map(r => String(r.staffId).trim()),
+        ...monthAttendanceRecords.map(a => String(a.staffId).trim())
+    ]);
+
+    let targetStaffList = [];
+    if (activeStaffIds.size > 0) {
+        targetStaffList = staff.filter(s => activeStaffIds.has(String(s.id).trim()));
+        
+        activeStaffIds.forEach(id => {
+            if (!targetStaffList.some(s => String(s.id).trim() === id)) {
+                const p = monthPayrollRecords.find(r => String(r.staffId).trim() === id);
+                const a = monthAttendanceRecords.find(att => String(att.staffId).trim() === id);
+                targetStaffList.push({
+                    id: id,
+                    name: (p ? p.name : (a ? a.name : "Staf " + id)),
+                    position: p ? p.position : "Not Set"
+                });
+            }
+        });
+    } else {
+        targetStaffList = [...staff];
+    }
+
+    if(targetStaffList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="31" style="padding:20px; color:var(--text-light);">Tiada rekod staf bagi bulan ${formatMonth(currentMonth)}.</td></tr>`;
         return;
     }
 
-    staff.forEach(s => {
+    targetStaffList.forEach(s => {
         const logs = attendance.filter(a => String(a.staffId).trim() === String(s.id).trim() && normalizeMonth(a.date) === currentMonth);
 
         // Header 1 - 31 ATAS Setiap Nama Staf
@@ -1444,7 +1705,7 @@ function renderAttendanceGrid() {
                 else if(log.status === "Public" || val === "CUTI") cls += " status-public", val="CUTI";
                 else if(log.status === "EL" || val === "EL") cls += " status-el", val="EL";
                 else if(log.status === "CTG" || val === "CTG") cls += " status-ctg", val="CTG";
-                else if(log.status === "Grey") cls += " status-grey", val="";
+                else if(log.status === "Grey" || val === "null") cls += " status-grey", val="null";
             }
 
             html += `<td class="${cls}" contenteditable="true" data-staffid="${s.id}" data-date="${dateStr}" data-type="in" onclick="handleCellClick(this)">${val}</td>`;
@@ -1508,24 +1769,24 @@ async function saveGridChanges() {
             };
         }
 
-        if(cell.classList.contains("status-mc")) {
+        if(cell.classList.contains("status-mc") || text === "MC") {
             recordsMap[key].status = "MC";
             recordsMap[key].checkIn = "MC";
-        } else if(cell.classList.contains("status-off")) {
+        } else if(cell.classList.contains("status-off") || text === "H/day") {
             recordsMap[key].status = "Off";
             recordsMap[key].checkIn = "H/day";
-        } else if(cell.classList.contains("status-public")) {
+        } else if(cell.classList.contains("status-public") || text === "CUTI") {
             recordsMap[key].status = "Public";
             recordsMap[key].checkIn = "CUTI";
-        } else if(cell.classList.contains("status-el")) {
+        } else if(cell.classList.contains("status-el") || text === "EL") {
             recordsMap[key].status = "EL";
             recordsMap[key].checkIn = "EL";
-        } else if(cell.classList.contains("status-ctg")) {
+        } else if(cell.classList.contains("status-ctg") || text === "CTG") {
             recordsMap[key].status = "CTG";
             recordsMap[key].checkIn = "CTG";
-        } else if(cell.classList.contains("status-grey")) {
+        } else if(cell.classList.contains("status-grey") || text === "null") {
             recordsMap[key].status = "Grey";
-            recordsMap[key].checkIn = "";
+            recordsMap[key].checkIn = "null";
         } else if(type === "in") {
             recordsMap[key].status = text ? "Hadir" : "Clear";
             recordsMap[key].checkIn = text;
@@ -1640,7 +1901,7 @@ function renderStaff() {
     if(!table) return;
 
     if(staff.length === 0) {
-        table.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod staf.</td></tr>`;
+        table.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod staf.</td></tr>`;
         return;
     }
 
@@ -1651,7 +1912,7 @@ function renderStaff() {
             <td>${escapeHtml(s.ic || "-")}</td>
             <td>${escapeHtml(s.position || "-")}</td>
             <td>${money(s.salary)}</td>
-            <td style="max-width:260px; white-space:pre-wrap;">${escapeHtml(s.notes || "-")}</td>
+            <td style="max-width:260px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(s.notes || "-")}</td>
             <td>
                 <button class="btn-small btn-edit" onclick="editStaff('${escapeJs(s.id)}')"><i class="fa-solid fa-user-pen"></i> Edit</button>
                 <button class="btn-small btn-delete" onclick="deleteStaff('${escapeJs(s.id)}')"><i class="fa-solid fa-user-minus"></i> Padam</button>
@@ -1682,7 +1943,7 @@ function renderHistory() {
     }
 
     if(filtered.length === 0) {
-        table.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod gaji dijumpai.</td></tr>`;
+        table.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod gaji dijumpai.</td></tr>`;
         return;
     }
 
@@ -1698,6 +1959,7 @@ function renderHistory() {
             <td>${money(r.gross)}</td>
             <td>${money(r.deductions)}</td>
             <td><strong>${money(r.net)}</strong></td>
+            <td style="max-width:200px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(r.notes || "-")}</td>
             <td>
                 <button class="btn-small btn-edit" onclick="editPayroll('${escapeJs(r.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
                 <button class="btn-small btn-slip" onclick="showPayslip('${escapeJs(r.id)}')"><i class="fa-solid fa-file-invoice"></i> Slip</button>
@@ -1918,6 +2180,7 @@ function hideLoading() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    checkAuth();
     document.getElementById("payMonth").value = getCurrentMonth();
     document.getElementById("attMonthFilter").value = getCurrentMonth();
     document.getElementById("companyName").value = settings.company;
