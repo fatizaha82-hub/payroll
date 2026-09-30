@@ -472,6 +472,8 @@ tbody tr:hover{ background: #f1f5f9; }
     background: #fff;
     border: 2px solid #000;
     font-family: Arial, sans-serif;
+    user-select: text; /* MEMBOLEHKAN HIGHLIGHT TEKS DENGAN MOUSE */
+    -webkit-user-select: text;
 }
 
 .att-grid-table {
@@ -501,6 +503,7 @@ tbody tr:hover{ background: #f1f5f9; }
     line-height: 1.1;
     outline: none;
     background: #fff;
+    cursor: text;
 }
 
 .att-cell-editable:focus {
@@ -831,6 +834,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <!-- PANEL PILIHAN WARNA & STATUS CUTI -->
                 <div class="color-palette">
                     <span style="font-weight:bold; font-size:12px;">Pilih Mod Warna Status:</span>
+                    <button class="color-btn" style="background:#fff;" onclick="setActiveStatus('EDIT')">Edit Masa / Teks (Biasa)</button>
                     <button class="color-btn status-mc" onclick="setActiveStatus('MC')">MC</button>
                     <button class="color-btn status-off" onclick="setActiveStatus('Off')">H/day (Off)</button>
                     <button class="color-btn status-public" onclick="setActiveStatus('Public')">Cuti Umum</button>
@@ -1087,7 +1091,7 @@ let settings = { company: "EMPIRE DAIE EJAY COLLECTION", address: "" };
 let editingPayrollId = null;
 let editingStaffId = null;
 
-let selectedStatusMode = "CLEAR";
+let selectedStatusMode = "EDIT";
 
 /* =========================================================
    LOG MASUK / LOG OUT FUNCTIONALITY
@@ -1601,18 +1605,19 @@ async function deletePayroll(id) {
 }
 
 /* =========================================================
-   EXCEL GRID ATTENDANCE SYSTEM WITH COPY-PASTE SUPPORT
+   EXCEL GRID ATTENDANCE SYSTEM WITH HIGHLIGHT & PASTE SUPPORT
 ========================================================= */
 function setActiveStatus(status) {
     selectedStatusMode = status;
     const label = document.getElementById("activeStatusLabel");
     if(status === 'Clear') label.textContent = "Aktif: PADAM STATUS";
-    else if(status === 'EDIT') label.textContent = "Aktif: EDIT MASA / TEKS";
+    else if(status === 'EDIT') label.textContent = "Aktif: EDIT MASA / TEKS (BIASA)";
     else label.textContent = "Aktif: MOD WARNA [" + status + "]";
 }
 
+/* PEMBAIKAN: JIKA DALAM MOD EDIT, BENARKAN MOUSE HIGHLIGHT BIASA TANPA MENGGANGGU */
 function handleCellClick(cell) {
-    if(selectedStatusMode === 'CLEAR' || selectedStatusMode === 'EDIT') return;
+    if(selectedStatusMode === 'EDIT') return; // Membolehkan highlight teks/sel biasa
 
     cell.className = "att-cell-editable";
 
@@ -1639,7 +1644,6 @@ function handleCellClick(cell) {
     }
 }
 
-/* SO KOD BAHARU: MEMBOLEHKAN PASTE DARIPADA EXCEL DIRECT KE GRID */
 function handleGridPaste(e) {
     const activeEl = document.activeElement;
     if (!activeEl || !activeEl.classList.contains("att-cell-editable")) return;
@@ -1672,7 +1676,6 @@ function handleGridPaste(e) {
                 const val = colText.trim();
                 targetCell.innerText = val;
 
-                // Auto-kemaskini status/warna jika teks padan
                 targetCell.className = "att-cell-editable";
                 if (val === "MC") targetCell.classList.add("status-mc");
                 else if (val === "H/day") targetCell.classList.add("status-off");
@@ -2242,7 +2245,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("attMonthFilter").value = getCurrentMonth();
     document.getElementById("companyName").value = settings.company;
 
-    // MENAMBAH LISTENER KHAUS UNTUK FUNGSI PASTE DARI EXCEL
+    // MENAMBAH LISTENER KHAS UNTUK PASTE EXCEL
     document.addEventListener("paste", handleGridPaste);
 
     loadAllData();
