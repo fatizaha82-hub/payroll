@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empire Daie Ejay Collection - Payroll Management</title>
+
+<!-- FontAwesome untuk Ikon Moden -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- XLSX Library -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+:root{
+    /* TURQUOISE & METALLIC GOLD PALETTE */
+    --primary: #0f766e;          /* Deep Turquoise */
+    --primary-dark: #115e59;     /* Darker Turquoise */
+    --primary-light: #ccfbf1;    /* Light Turquoise Soft */
+    --primary-bg: #f0fdf4;       /* Subtle Turquoise/Green Tint Background */
+    
+    --gold: #d97706;              /* Base Gold */
+    --gold-dark: #b45309;        /* Dark Metallic Gold */
+    --gold-light: #fef3c7;       /* Light Soft Gold */
+    --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); /* Metallic Gold Gradient */
+    --gold-btn-gradient: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --border: #cbd5e1;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --success: #10b981;
+    --sidebar-width: 260px;
+    --radius: 12px;
+    --shadow: 0 4px 20px -2px rgba(15, 118, 110, 0.08);
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* =========================================================
+   LOGIN OVERLAY / ADMIN GATE
+========================================================= */
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0f766e 0%, #0f172a 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--white);
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    padding: 36px 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    text-align: center;
+    border: 2px solid #d97706;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--gold-gradient);
+}
+
+.login-logo {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 800;
+    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.3);
+}
+
+.login-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.login-subtitle {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+.login-card .form-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.login-card label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--gold-gradient);
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(180, 83, 9, 0.35);
+}
+
+.login-error {
+    color: var(--danger-dark);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    display: none;
+    background: #fee2e2;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.app{
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR & NAV */
+.sidebar{
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    padding: 24px 16px;
+    z-index: 50;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-area{
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.logo-circle{
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--gold-gradient);
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.logo-title{
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--primary-dark);
+}
+
+.logo-subtitle{
+    margin-top: 3px;
+    font-size: 10px;
+    color: var(--gold-dark);
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.nav{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.nav button{
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 12px 16px;
+    text-align: left;
+    border-radius: var(--radius);
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav button i{
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav button:hover{
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    transform: translateX(4px);
+}
+
+.nav button.active{
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+
+.logout-btn {
+    margin-top: auto;
+    border: 1px solid #fee2e2;
+    background: #fef2f2;
+    color: var(--danger-dark);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: var(--danger);
+    color: var(--white);
+}
+
+/* MAIN CONTENT */
+.main{
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    padding: 32px;
+    transition: all 0.3s ease;
+}
+
+.page{
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page.active{
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.page-header{
+    margin-bottom: 24px;
+}
+
+.page-header h1{
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--primary-dark);
+}
+
+.page-header p{
+    margin-top: 4px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+/* CARDS & STATS */
+.card{
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+}
+
+.stats{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card{
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 4px;
+    background: var(--gold-gradient);
+}
+
+.stat-card:hover{ transform: translateY(-3px); }
+
+.stat-icon{
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.stat-label{ color: var(--text-light); font-size: 12px; font-weight: 600; }
+.stat-value{ font-size: 20px; font-weight: 800; color: var(--primary-dark); margin-top: 2px; }
+
+/* FORMS & INPUTS */
+.form-grid{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.form-grid-3{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.form-group{ margin-bottom: 12px; }
+.form-group label{ display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--primary-dark); }
+
+input, select, textarea{
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--white);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus{
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+}
+
+textarea{ min-height: 80px; resize: vertical; }
+
+.edit-label {
+    display: none;
+    background: var(--gold-light);
+    color: var(--gold-dark);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--gold);
+}
+.edit-label.show { display: block; }
+
+/* BUTTONS */
+.btn{
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-gold{ background: var(--gold-btn-gradient); color: #fff; box-shadow: 0 2px 8px rgba(180, 83, 9, 0.2); }
+.btn-gold:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3); }
+
+.btn-primary{ background: var(--primary); color: #fff; }
+.btn-primary:hover{ background: var(--primary-dark); transform: translateY(-1px); }
+
+.btn-secondary{ background: #e2e8f0; color: var(--text); }
+.btn-secondary:hover{ background: #cbd5e1; }
+.btn-danger{ background: var(--danger); color: #fff; }
+.btn-danger:hover{ background: var(--danger-dark); }
+.btn-row{ display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+.btn-small{
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-edit{ background: var(--gold-light); color: var(--gold-dark); }
+.btn-slip{ background: var(--primary-light); color: var(--primary-dark); }
+.btn-delete{ background: #fee2e2; color: #b91c1c; }
+
+/* TABLES */
+.table-wrap{ width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+table{ width: 100%; border-collapse: collapse; min-width: 600px; }
+thead th{ background: var(--primary-bg); color: var(--primary-dark); text-align: left; padding: 12px 14px; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--border); }
+tbody td{ padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tbody tr:hover{ background: #f1f5f9; }
+
+/* =========================================================
+   EXCEL GRID ATTENDANCE SYSTEM
+========================================================= */
+.att-grid-container {
+    overflow-x: auto;
+    background: #fff;
+    border: 2px solid #000;
+    font-family: Arial, sans-serif;
+}
+
+.att-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    text-align: center;
+    min-width: 1300px;
+}
+
+.att-grid-table th, .att-grid-table td {
+    border: 1px solid #000;
+    padding: 1px;
+    height: 22px;
+    width: 35px;
+    white-space: nowrap;
+}
+
+.att-header-cyan {
+    background-color: #99f6e4 !important;
+    font-weight: bold;
+    color: #0f766e;
+}
+
+.att-cell-editable {
+    font-size: 10px;
+    line-height: 1.1;
+    outline: none;
+    background: #fff;
+}
+
+.att-cell-editable:focus {
+    background-color: #ccfbf1;
+    box-shadow: inset 0 0 0 2px #0f766e;
+}
+
+/* PALET WARNA STATUS CUTI/OFF */
+.status-mc { background-color: #92d050 !important; color: #000; font-weight: bold; }
+.status-off { background-color: #c55a11 !important; color: #fff; font-weight: bold; }
+.status-public { background-color: #ffc000 !important; color: #000; font-weight: bold; }
+.status-el { background-color: #00b0f0 !important; color: #fff; font-weight: bold; }
+.status-ctg { background-color: #ed7d31 !important; color: #fff; font-weight: bold; }
+.status-grey { background-color: #b7b7b7 !important; color: #1e293b !important; font-weight: bold; }
+
+.color-palette {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.color-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #000;
+}
+
+/* PAYSLIP DESIGN */
+.payslip-wrapper{ max-width: 820px; margin: auto; }
+.payslip{ background: #fff; border: 2px solid var(--primary-dark); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); color: #1e293b; font-size: 13px; }
+.payslip-header-table { width:100%; border-bottom: 2px solid var(--primary-dark); padding-bottom: 12px; margin-bottom: 20px; }
+.company-title { font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--primary-dark); margin:0; }
+.company-sub { font-size: 11px; color: var(--text-light); margin-top: 4px; line-height: 1.4; }
+.slip-badge { text-align: right; font-size: 18px; font-weight: 800; color: var(--gold-dark); text-transform: uppercase; white-space: nowrap; }
+
+.info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.info-table td { padding: 5px 6px; font-size: 12px; }
+.info-table td.lbl { font-weight: 600; color: var(--text-light); width: 16%; }
+.info-table td.val { font-weight: 700; color: var(--primary-dark); width: 34%; }
+
+.breakdown-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
+.breakdown-table th { color: var(--primary-dark); padding: 8px; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); background-color: var(--primary-bg); }
+.breakdown-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+.breakdown-table td.amount { text-align: right; font-weight: 600; padding-right: 12px; }
+
+.total-bar-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
+.total-bar-table td { padding: 10px 8px; font-weight: 800; font-size: 12px; color: var(--primary-dark); border-top: 2px solid var(--border); border-bottom: 2px solid var(--border); background-color: var(--primary-bg); }
+
+.net-pay-box {
+    background-color: var(--primary-bg);
+    border: 2px dashed var(--primary);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.net-pay-title { font-size: 14px; font-weight: 800; color: var(--primary-dark); }
+.net-pay-value { font-size: 20px; font-weight: 800; color: var(--gold-dark); }
+.payslip-footer-text { margin-top: 15px; font-size: 11px; color: var(--text-light); text-align: center; font-style: italic; border-top: 1px solid var(--border); padding-top: 10px; }
+
+.print-row{ display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+
+/* LOADING & TOAST */
+.loading{ display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.loading.show{ display: flex; }
+.loading-box{ background: #fff; padding: 24px 36px; border-radius: var(--radius); text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.spinner{ width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite; }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+.toast{ position: fixed; right: 24px; bottom: 24px; background: var(--primary-dark); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transform: translateY(15px); transition: all 0.3s ease; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.toast.show{ opacity: 1; transform: translateY(0); }
+.toast.success{ background: var(--success); }
+.toast.error{ background: var(--danger); }
+
+@media (max-width: 900px){
+    .sidebar{ width: 70px; padding: 16px 8px; }
+    .logo-title, .logo-subtitle, .nav button span, .logout-btn span{ display: none; }
+    .main{ margin-left: 70px; width: calc(100% - 70px); padding: 20px; }
+    .nav button{ justify-content: center; padding: 12px; }
+    .nav button i{ font-size: 18px; width: auto; }
+}
+
+@media (max-width: 650px){
+    .app{ flex-direction: column; }
+    .sidebar{ width: 100%; height: auto; position: relative; border-right: 0; border-bottom: 1px solid var(--border); padding: 12px 16px; }
+    .logo-area{ display: none; }
+    .nav{ flex-direction: row; justify-content: space-around; gap: 0; }
+    .main{ margin-left: 0; width: 100%; padding: 16px; }
+    .form-grid, .form-grid-3{ grid-template-columns: 1fr; }
+    .filter-row{ flex-direction: column; }
+    .stats{ grid-template-columns: 1fr; }
+}
+
+@page { size: A4 portrait; margin: 8mm; }
+@media print{
+    html, body { background: #fff; height: 100%; overflow: hidden; }
+    .sidebar, .page-header, .print-row, .no-print, .login-overlay{ display: none !important; }
+    .main{ margin: 0; width: 100%; padding: 0; }
+    .page{ display: none !important; }
+    #payslipPage{ display: block !important; opacity: 1 !important; transform: none !important; }
+    .payslip-wrapper { max-width: 100%; margin: 0; }
+    .payslip{ border: 2px solid #000; box-shadow: none; padding: 15px; border-radius: 8px; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOG MASUK ADMIN OVERLAY -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <div class="login-logo">ED</div>
+        <div class="login-title">EMPIRE DAIE EJAY COLLECTION</div>
+        <div class="login-subtitle">PAYROLL MANAGEMENT ADMIN LOGIN</div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Kata Laluan Admin / PIN</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan Kata Laluan" required autofocus>
+            </div>
+            <button type="submit" class="login-btn"><i class="fa-solid fa-right-to-bracket"></i> LOG MASUK</button>
+            <div id="loginError" class="login-error"><i class="fa-solid fa-circle-exclamation"></i> Kata laluan salah! Sila cuba lagi.</div>
+        </form>
+    </div>
+</div>
+
+<div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar no-print">
+        <div class="logo-area">
+            <div class="logo-circle">ED</div>
+            <div class="logo-title">EMPIRE DAIE EJAY COLLECTION</div>
+            <div class="logo-subtitle">PAYROLL SYSTEM</div>
+        </div>
+        <nav class="nav">
+            <button class="active" onclick="showPage('dashboard',this)">
+                <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
+            </button>
+            <button onclick="showPage('payroll',this)">
+                <i class="fa-solid fa-calculator"></i><span>Pengiraan Gaji</span>
+            </button>
+            <button onclick="showPage('attendance',this)">
+                <i class="fa-solid fa-calendar-check"></i><span>Kehadiran</span>
+            </button>
+            <button onclick="showPage('staff',this)">
+                <i class="fa-solid fa-users"></i><span>Staf</span>
+            </button>
+            <button onclick="showPage('history',this)">
+                <i class="fa-solid fa-clock-rotate-left"></i><span>Sejarah Gaji</span>
+            </button>
+            <button onclick="showPage('import',this)">
+                <i class="fa-solid fa-file-excel"></i><span>Import Excel</span>
+            </button>
+            <button onclick="showPage('settings',this)">
+                <i class="fa-solid fa-gear"></i><span>Tetapan</span>
+            </button>
+        </nav>
+        
+        <button class="logout-btn" onclick="logoutAdmin()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log Keluar</span>
+        </button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="page active">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Ringkasan pengurusan gaji perniagaan anda</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+                    <div>
+                        <div class="stat-label">Jumlah Staf</div>
+                        <div class="stat-value" id="statStaff">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <div>
+                        <div class="stat-label">Jumlah Rekod Gaji</div>
+                        <div class="stat-value" id="statPayroll">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div>
+                        <div class="stat-label">Jumlah Gaji Bersih</div>
+                        <div class="stat-value" id="statNet">RM 0.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div>
+                        <div class="stat-label">Bulan Paparan</div>
+                        <div class="stat-value" id="statMonth">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="page-header" style="margin-bottom:16px;">
+                    <h2 style="font-size:18px;"><i class="fa-solid fa-list-check" style="margin-right:8px; color:var(--gold);"></i>Rekod Gaji Terkini</h2>
+                </div>
+
+                <div class="filter-row" style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+                    <select id="dashSearchStaff" onchange="renderDashboardPayroll()" style="flex:1;">
+                        <option value="">-- Semua Staf --</option>
+                    </select>
+                    <input type="month" id="dashMonth" onchange="renderDashboardPayroll()" style="width:200px;">
+                    <button class="btn btn-secondary" onclick="clearDashboardFilter()"><i class="fa-solid fa-filter-circle-xmark"></i> Reset Filter</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Bersih</th><th>Catatan</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="dashboardPayrollTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAYROLL -->
+        <section id="payroll" class="page">
+            <div class="page-header">
+                <h1>Pengiraan Gaji</h1>
+                <p>Sediakan rekod gaji bulanan staf</p>
+            </div>
+            <div class="card">
+                <div id="editModeLabel" class="edit-label"><i class="fa-solid fa-pen-to-square"></i> Anda sedang mengedit rekod gaji.</div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> Nama Staf</label>
+                        <select id="payStaff" onchange="staffSelected()"><option value="">-- Pilih Staf --</option></select>
+                    </div>
+                    <div class="form-group"><label><i class="fa-solid fa-calendar"></i> Bulan</label><input type="month" id="payMonth"></div>
+                    <div class="form-group"><label><i class="fa-solid fa-id-card"></i> IC</label><input type="text" id="payIC" readonly></div>
+                    <div class="form-group"><label><i class="fa-solid fa-briefcase"></i> Jawatan</label><input type="text" id="payPosition" readonly></div>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+                <h3 style="font-size:15px; margin-bottom:12px; color:var(--gold-dark);"><i class="fa-solid fa-money-bill-wave"></i> Gaji Asas</h3>
+                <div class="form-grid-3">
+                    <div class="form-group"><label>Gaji Bulanan (RM)</label><input type="number" id="salary" step="0.01" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Gaji Harian (RM)</label><input type="number" id="dailyRate" readonly></div>
+                    <div class="form-group"><label>Gaji Sejam (RM)</label><input type="number" id="hourlyRate" readonly></div>
+                </div>
+
+                <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--gold-dark);"><i class="fa-solid fa-clock"></i> Lebih Masa / OT</h3>
+                <div class="form-grid-3">
+                    <div class="form-group"><label>Jam OT</label><input type="number" id="otHours" step="0.01" min="0" value="0" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Kadar OT / Jam (RM)</label><input type="number" id="otRate" step="0.01" min="0" value="0" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Jumlah OT (RM)</label><input type="number" id="otTotal" readonly></div>
+                </div>
+
+                <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--gold-dark);"><i class="fa-solid fa-gift"></i> Tambahan</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>Bonus (RM)</label><input type="number" id="bonus" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Elaun (RM)</label><input type="number" id="allowance" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                </div>
+
+                <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--danger);"><i class="fa-solid fa-scissors"></i> Potongan</h3>
+                <div class="form-grid-3">
+                    <div class="form-group"><label>Hari Cuti Tanpa Gaji</label><input type="number" id="unpaidDays" min="0" step="0.5" value="0" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Jumlah Cuti Tanpa Gaji (RM)</label><input type="number" id="unpaidTotal" readonly></div>
+                    <div class="form-group"><label>Advance (RM)</label><input type="number" id="advance" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Potongan Lain (RM)</label><input type="number" id="otherDeduction" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;">
+                    <label><i class="fa-solid fa-note-sticky"></i> Catatan (Kesan Staf Baru / Berhenti dll)</label>
+                    <textarea id="payNotes" placeholder="Contoh: Staf baru masuk 15hb, cuti kecemasan, pelarasan gaji, staf berhenti akhir bulan, dan lain-lain."></textarea>
+                </div>
+
+                <div class="summary-box" style="background:var(--primary-bg); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Jumlah OT</span><strong id="summaryOT">RM 0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Bonus</span><strong id="summaryBonus">RM 0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Elaun</span><strong id="summaryAllowance">RM 0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Gaji Kasar</span><strong id="summaryGross">RM 0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Jumlah Potongan</span><strong id="deductionTotal">RM 0.00</strong></div>
+                    <hr style="margin:8px 0; border:0; border-top:1px dashed var(--border);">
+                    <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:800; color:var(--gold-dark);"><span>GAJI BERSIH</span><strong id="netSalary">RM 0.00</strong></div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-gold" id="payrollSaveBtn" onclick="savePayroll()"><i class="fa-solid fa-floppy-disk"></i> Simpan Rekod Gaji</button>
+                    <button class="btn btn-secondary" id="payrollCancelBtn" onclick="resetPayrollForm()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATTENDANCE GRID (EXCEL FORMAT 1-31 KOTAK EDITABLE) -->
+        <section id="attendance" class="page">
+            <div class="page-header">
+                <h1 style="color:var(--primary-dark); text-align:center; font-size:30px;">Attend. Logs</h1>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div style="font-weight:700; font-size:14px; color:var(--primary-dark);">
+                        Date : <input type="month" id="attMonthFilter" onchange="renderAttendanceGrid()" style="width:160px; display:inline-block; padding:4px 8px;">
+                    </div>
+                    <div class="btn-row" style="margin-top:0;">
+                        <button class="btn btn-gold" onclick="saveGridChanges()"><i class="fa-solid fa-floppy-disk"></i> Simpan Semua Perubahan</button>
+                        <button class="btn btn-secondary" onclick="renderAttendanceGrid()"><i class="fa-solid fa-arrows-rotate"></i> Reset Grid</button>
+                    </div>
+                </div>
+
+                <!-- PANEL PILIHAN WARNA & STATUS CUTI -->
+                <div class="color-palette">
+                    <span style="font-weight:bold; font-size:12px;">Pilih Mod Warna Status:</span>
+                    <button class="color-btn status-mc" onclick="setActiveStatus('MC')">MC</button>
+                    <button class="color-btn status-off" onclick="setActiveStatus('Off')">H/day (Off)</button>
+                    <button class="color-btn status-public" onclick="setActiveStatus('Public')">Cuti Umum</button>
+                    <button class="color-btn status-el" onclick="setActiveStatus('EL')">EL</button>
+                    <button class="color-btn status-ctg" onclick="setActiveStatus('CTG')">CTG</button>
+                    <button class="color-btn status-grey" onclick="setActiveStatus('Grey')" title="Kosong / Kelabu" aria-label="Kosong / Kelabu">&nbsp;</button>
+                    <button class="color-btn" style="background:#fff;" onclick="setActiveStatus('Clear')">Padam Status/Warna</button>
+                    <span id="activeStatusLabel" style="margin-left:auto; font-weight:bold; font-size:12px; color:var(--gold-dark);">Aktif: EDIT MASA / TEKS</span>
+                </div>
+
+                <div class="att-grid-container">
+                    <table class="att-grid-table">
+                        <tbody id="attGridBody">
+                            <!-- Paparan Grid Excel dipaparkan secara dinamik oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- STAFF -->
+        <section id="staff" class="page">
+            <div class="page-header">
+                <h1>Pengurusan Staf</h1>
+                <p>Tambah dan kemaskini profil pekerja</p>
+            </div>
+            <div class="card">
+                <h3 id="staffFormTitle" style="font-size:16px; margin-bottom:12px;">Tambah Staf Baharu</h3>
+                <div id="editingStaffLabel" class="edit-label"><i class="fa-solid fa-pen"></i> Anda sedang mengedit maklumat staf.</div>
+                
+                <div class="form-grid-3">
+                    <div class="form-group"><label>Nama Staf</label><input type="text" id="staffName" placeholder="Nama penuh"></div>
+                    <div class="form-group"><label>No. IC</label><input type="text" id="staffIC" placeholder="Contoh: 900101-01-1234"></div>
+                    <div class="form-group"><label>Jawatan</label><input type="text" id="staffPosition" placeholder="Jawatan"></div>
+                    <div class="form-group"><label>Gaji Bulanan (RM)</label><input type="number" id="staffSalary" step="0.01" min="0"></div>
+                    
+                    <!-- DUA MEDAN BAHARU UNTUK AKAUN BANK -->
+                    <div class="form-group"><label><i class="fa-solid fa-building-columns"></i> Nama Bank</label><input type="text" id="staffBankName" placeholder="Contoh: Maybank / CIMB"></div>
+                    <div class="form-group"><label><i class="fa-solid fa-credit-card"></i> No. Akaun Bank</label><input type="text" id="staffBankAccount" placeholder="Contoh: 162345678901"></div>
+
+                    <div class="form-group" style="grid-column: span 3;"><label>Catatan Staf (Status Berkhidmat / Baharu / Berhenti)</label><textarea id="staffNotes" rows="3" placeholder="Contoh: Mula berkhidmat 01/02/2026 atau Berhenti 30/09/2026"></textarea></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-gold" id="staffSaveBtn" onclick="addStaff()"><i class="fa-solid fa-user-plus"></i> Simpan Staf</button>
+                    <button class="btn btn-secondary" id="staffCancelBtn" onclick="cancelStaffEdit()"><i class="fa-solid fa-xmark"></i> Batal</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size:16px; margin-bottom:16px;">Senarai Staf Berdaftar</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Bil</th><th>Nama</th><th>IC</th><th>Jawatan</th><th>Gaji (RM)</th><th>Maklumat Bank</th><th>Catatan</th><th>Tindakan</th></tr></thead>
+                        <tbody id="staffTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- HISTORY -->
+        <section id="history" class="page">
+            <div class="page-header">
+                <h1>Sejarah Gaji</h1>
+                <p>Semak rekod slip gaji lampau dan catatan status staf</p>
+            </div>
+            <div class="card">
+                <div class="filter-row" style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+                    <select id="historySearchStaff" onchange="renderHistory()" style="flex:1;">
+                        <option value="">-- Semua Staf --</option>
+                    </select>
+                    <input type="month" id="historyMonth" onchange="renderHistory()" style="width:200px;">
+                    <button class="btn btn-secondary" onclick="clearHistoryFilter()"><i class="fa-solid fa-filter-circle-xmark"></i> Reset Filter</button>
+                </div>
+                <div id="historyCount" class="history-info" style="font-size:12px; color:var(--text-light); margin-bottom:12px;">Jumlah rekod dipaparkan: 0 | Jumlah rekod gaji: 0</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Bil</th><th>Bulan</th><th>Nama</th><th>Jawatan</th><th>Gaji Kasar</th><th>Potongan</th><th>Gaji Bersih</th><th>Catatan</th><th>Tindakan</th></tr></thead>
+                        <tbody id="historyTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMPORT EXCEL -->
+        <section id="import" class="page">
+            <div class="page-header">
+                <h1>Import Data Excel</h1>
+                <p>Muat naik data staf secara pukal</p>
+            </div>
+            <div class="card">
+                <div class="import-box" style="text-align:center; padding:20px;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; color:var(--gold-dark); margin-bottom:12px;"></i>
+                    <h3>Pilih Fail Excel</h3>
+                    <p style="color:var(--text-light); font-size:13px; margin-top:4px;">Pastikan kolum mengandungi: <b>Nama, IC, Jawatan, Gaji, NamaBank, NoAkaun</b></p>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" style="margin-top:20px; max-width:360px;">
+                    <div class="btn-row" style="justify-content:center;">
+                        <button class="btn btn-gold" onclick="importExcel()"><i class="fa-solid fa-file-import"></i> Mulakan Import</button>
+                    </div>
+                    <div id="importResult" style="margin-top:20px; font-size:13px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings" class="page">
+            <div class="page-header">
+                <h1>Tetapan Syarikat</h1>
+                <p>Kemaskini maklumat profil pada slip gaji</p>
+            </div>
+            <div class="card">
+                <div class="form-grid">
+                    <div class="form-group"><label>Nama Syarikat</label><input type="text" id="companyName"></div>
+                    <div class="form-group"><label>Alamat Syarikat & No. Tel</label><textarea id="companyAddress"></textarea></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-gold" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> Simpan Tetapan</button>
+                    <button class="btn btn-danger" onclick="deleteAllData()"><i class="fa-solid fa-trash-can"></i> Padam Semua Rekod</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAYSLIP DISPLAY -->
+        <section id="payslipPage" class="page">
+            <div class="page-header no-print">
+                <h1>Pratonton Slip Gaji</h1>
+                <p>Sedia untuk dicetak atau disimpan sebagai PDF</p>
+            </div>
+            <div class="payslip-wrapper">
+                <div id="payslip" class="payslip">
+                    
+                    <table class="payslip-header-table">
+                        <tr>
+                            <td>
+                                <div id="slipCompany" class="company-title">EMPIRE DAIE EJAY COLLECTION</div>
+                                <div id="slipAddress" class="company-sub">
+                                    No 2-13, 03, Jalan Medan Pusat Bandar 8, Seksyen 9, 43650 Bandar Baru Bangi, Selangor.<br>
+                                    Tel: 011-57716165 | 016-3414452
+                                </div>
+                            </td>
+                            <td class="slip-badge">SLIP GAJI</td>
+                        </tr>
+                    </table>
+
+                    <table class="info-table">
+                        <tr>
+                            <td class="lbl">Nama Pekerja:</td>
+                            <td class="val" id="slipName">-</td>
+                            <td class="lbl">Bulan/Tahun:</td>
+                            <td class="val" id="slipMonth">-</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">No. ID Staf:</td>
+                            <td class="val" id="slipStaffID">-</td>
+                            <td class="lbl">No. KP:</td>
+                            <td class="val" id="slipIC">-</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Jawatan:</td>
+                            <td class="val" id="slipPosition" colspan="3">-</td>
+                        </tr>
+                    </table>
+
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th style="width:32%;">PENDAPATAN / ELAUN</th>
+                                <th style="width:18%; text-align:right; padding-right:12px;">AMAUN</th>
+                                <th style="width:32%; padding-left:10px;">POTONGAN GAJI</th>
+                                <th style="width:18%; text-align:right; padding-right:12px;">AMAUN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Gaji Asas</td>
+                                <td class="amount" id="slipSalary">RM 0.00</td>
+                                <td style="padding-left:10px;">Pendahuluan Diri / Pinjaman</td>
+                                <td class="amount" id="slipAdvance">RM 0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Elaun Tetap / Kehadiran</td>
+                                <td class="amount" id="slipAllowance">RM 0.00</td>
+                                <td style="padding-left:10px;">Cuti Tanpa Gaji (<span id="slipUnpaidDays">0</span> hari)</td>
+                                <td class="amount" id="slipUnpaid">RM 0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Elaun Lebih Masa (OT) (<span id="slipOtHours">0</span> jam)</td>
+                                <td class="amount" id="slipOT">RM 0.00</td>
+                                <td style="padding-left:10px;">Potongan Lain</td>
+                                <td class="amount" id="slipOther">RM 0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Bonus</td>
+                                <td class="amount" id="slipBonus">RM 0.00</td>
+                                <td style="padding-left:10px;"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="total-bar-table">
+                        <tr>
+                            <td style="width:32%;">JUMLAH PENDAPATAN:</td>
+                            <td class="text-right" style="width:18%; padding-right:12px;" id="slipGross">RM 0.00</td>
+                            <td style="width:32%; padding-left:10px;">JUMLAH POTONGAN:</td>
+                            <td class="text-right" style="width:18%; padding-right:12px;" id="slipDeductions">RM 0.00</td>
+                        </tr>
+                    </table>
+
+                    <div class="net-pay-box">
+                        <div class="net-pay-title">GAJI BERSIH (NET PAY):</div>
+                        <div class="net-pay-value" id="slipNet">RM 0.00</div>
+                    </div>
+
+                    <div id="slipNotesBox" style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--primary-bg); font-size:11px;">
+                        <strong>Catatan:</strong> <span id="slipNotes">-</span>
+                    </div>
+
+                    <div class="payslip-footer-text">
+                        Slip ini dijana automatik oleh sistem Payroll Empire Daie Ejay Collection.
+                    </div>
+
+                </div>
+                <div class="print-row no-print">
+                    <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-print"></i> Cetak Slip</button>
+                    <button class="btn btn-secondary" onclick="showPage('history',null)"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading" class="loading">
+    <div class="loading-box">
+        <div class="spinner"></div>
+        <div id="loadingText" style="font-weight:600; font-size:14px; color:var(--primary-dark);">Memproses...</div>
+    </div>
+</div>
+
+<!-- TOAST ALERT -->
+<div id="toast" class="toast"></div>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbztfRgz_iCkC7Glid6CYznBkm7e-ZKfRYXhV8SO4Prkl2PtnezrcFHQDgZO-lVB1xwg1w/exec";
+
+// ADMIN PASSWORD CONFIGURATION
+const ADMIN_PASS = "admin123";
+const ADMIN_PIN = "1234";
+
+let staff = [];
+let payroll = [];
+let attendance = [];
+let settings = { company: "EMPIRE DAIE EJAY COLLECTION", address: "" };
+let editingPayrollId = null;
+let editingStaffId = null;
+
+let selectedStatusMode = "CLEAR";
+
+/* =========================================================
+   LOG MASUK / LOG OUT FUNCTIONALITY
+========================================================= */
+function checkAuth() {
+    const isLoggedIn = localStorage.getItem("edec_admin_logged");
+    const overlay = document.getElementById("loginOverlay");
+    if(isLoggedIn === "true") {
+        overlay.style.display = "none";
+    } else {
+        overlay.style.display = "flex";
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const inputPass = document.getElementById("loginPassword").value.trim();
+    const errorMsg = document.getElementById("loginError");
+
+    if(inputPass === ADMIN_PASS || inputPass === ADMIN_PIN) {
+        localStorage.setItem("edec_admin_logged", "true");
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("loginPassword").value = "";
+        errorMsg.style.display = "none";
+        showToast("Log Masuk Berjaya!", "success");
+    } else {
+        errorMsg.style.display = "block";
+    }
+}
+
+function logoutAdmin() {
+    if(confirm("Adakah anda pasti untuk Log Keluar?")) {
+        localStorage.removeItem("edec_admin_logged");
+        checkAuth();
+        showToast("Anda telah log keluar.", "success");
+    }
+}
+
+async function api(action, data = {}) {
+    try {
+        showLoading("Memproses...");
+        const response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action, ...data })
+        });
+        const text = await response.text();
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch(e) {
+            throw new Error("Respons API bukan JSON. " + text.substring(0, 200));
+        }
+        if (!result.success) throw new Error(result.message || "Operasi gagal.");
+        return result;
+    } finally {
+        hideLoading();
+    }
+}
+
+async function loadAllData() {
+    try {
+        showLoading("Memuatkan data...");
+        await api("setup");
+        const result = await api("getAll");
+
+        const rawStaff = result.staff || result.STAFF || (result.data && result.data.staff) || [];
+        const rawPayroll = result.payroll || result.PAYROLL || (result.data && result.data.payroll) || [];
+        const rawAttendance = result.attendance || result.ATTENDANCE || (result.data && result.data.attendance) || [];
+
+        staff = normalizeStaff(Array.isArray(rawStaff) ? rawStaff : []);
+        payroll = normalizePayroll(Array.isArray(rawPayroll) ? rawPayroll : []);
+        attendance = normalizeAttendance(Array.isArray(rawAttendance) ? rawAttendance : []);
+
+        const s = result.settings || result.SETTINGS || {};
+        settings.company = s.companyName || s.company || "EMPIRE DAIE EJAY COLLECTION";
+        settings.address = s.companyAddress || s.address || "";
+
+        const companyName = document.getElementById("companyName");
+        const companyAddress = document.getElementById("companyAddress");
+        if(companyName) companyName.value = settings.company;
+        if(companyAddress) companyAddress.value = settings.address;
+
+        renderStaff();
+        populateStaffSelect();
+        populateFilterSelects();
+        renderDashboardPayroll();
+        renderHistory();
+        renderAttendanceGrid();
+        updateHistoryCount();
+    } catch(error) {
+        console.error("LOAD DATA ERROR:", error);
+        showToast("Gagal memuatkan data: " + error.message, "error");
+    } finally {
+        hideLoading();
+    }
+}
+
+function normalizeStaff(rows) {
+    if(!Array.isArray(rows)) return [];
+    return rows.map(r => {
+        const findVal = (...keys) => {
+            for (let k of keys) {
+                for (let key in r) {
+                    if (key.trim().toLowerCase() === k.toLowerCase()) return r[key];
+                }
+            }
+            return "";
+        };
+        return {
+            id: String(findVal("id")).trim(),
+            name: findVal("nama", "name"),
+            ic: findVal("ic"),
+            position: findVal("jawatan", "position"),
+            salary: Number(findVal("gaji", "salary") || 0),
+            bankName: findVal("namabank", "bankname"),
+            bankAccount: findVal("noakaun", "bankaccount"),
+            notes: findVal("catatan", "notes"),
+            createdAt: findVal("createdat"),
+            updatedAt: findVal("updatedat")
+        };
+    });
+}
+
+function normalizePayroll(rows) {
+    if(!Array.isArray(rows)) return [];
+    return rows.map(r => {
+        const findVal = (...keys) => {
+            for (let k of keys) {
+                for (let key in r) {
+                    if (key.trim().toLowerCase() === k.toLowerCase()) return r[key];
+                }
+            }
+            return "";
+        };
+
+        return {
+            id: String(findVal("id")).trim(),
+            month: findVal("bulan", "month"),
+            staffId: String(findVal("staffid")).trim(),
+            name: findVal("nama", "name"),
+            ic: findVal("ic"),
+            position: findVal("jawatan", "position"),
+            salary: Number(findVal("gaji", "salary") || 0),
+            daily: Number(findVal("gajiharian", "daily") || 0),
+            hourly: Number(findVal("gajijam", "hourly") || 0),
+            hours: Number(findVal("otjam", "hours") || 0),
+            otRate: Number(findVal("kadarot", "otrate") || 0),
+            ot: Number(findVal("jumlahot", "ot") || 0),
+            bonus: Number(findVal("bonus") || 0),
+            allowance: Number(findVal("elaun", "allowance") || 0),
+            unpaidDays: Number(findVal("haricutitanpagaji", "unpaiddays") || 0),
+            unpaid: Number(findVal("jumlahcutitanpagaji", "unpaid") || 0),
+            advance: Number(findVal("advance") || 0),
+            other: Number(findVal("potonganlain", "other") || 0),
+            gross: Number(findVal("gajikasar", "gross") || 0),
+            deductions: Number(findVal("jumlahpotongan", "deductions") || 0),
+            net: Number(findVal("gajibersih", "net") || 0),
+            notes: findVal("catatan", "notes"),
+            createdAt: findVal("createdat"),
+            updatedAt: findVal("updatedat")
+        };
+    });
+}
+
+function normalizeAttendance(rows) {
+    if(!Array.isArray(rows)) return [];
+    return rows.map(r => {
+        const findVal = (...keys) => {
+            for (let k of keys) {
+                for (let key in r) {
+                    if (key.trim().toLowerCase() === k.toLowerCase()) return r[key];
+                }
+            }
+            return "";
+        };
+
+        return {
+            id: String(findVal("id")).trim(),
+            staffId: String(findVal("staffid")).trim(),
+            name: findVal("nama", "name"),
+            date: findVal("tarikh", "date"),
+            checkIn: findVal("masamasuk", "checkin"),
+            checkOut: findVal("masakeluar", "checkout"),
+            otHours: Number(findVal("jamot", "othours") || 0),
+            status: findVal("status") || "Hadir",
+            notes: findVal("catatan", "notes"),
+            createdAt: findVal("createdat"),
+            updatedAt: findVal("updatedat")
+        };
+    });
+}
+
+function showPage(pageId, button) {
+    document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+    const page = document.getElementById(pageId);
+    if(page) page.classList.add("active");
+
+    document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+    if(button) {
+        button.classList.add("active");
+    } else {
+        const navButton = document.querySelector(`.nav button[onclick*="'${pageId}'"]`);
+        if(navButton) navButton.classList.add("active");
+    }
+
+    if(pageId === "history") renderHistory();
+    if(pageId === "staff") renderStaff();
+    if(pageId === "payroll") populateStaffSelect();
+    if(pageId === "attendance") { populateStaffSelect(); renderAttendanceGrid(); }
+    if(pageId === "dashboard") renderDashboardPayroll();
+}
+
+function renderDashboardPayroll() {
+    const table = document.getElementById("dashboardPayrollTable");
+    if(!table) return;
+
+    const selectedStaff = document.getElementById("dashSearchStaff")?.value || "";
+    const selectedMonth = document.getElementById("dashMonth")?.value || "";
+
+    let filtered = payroll.filter(r => {
+        const matchStaff = !selectedStaff || String(r.staffId).trim() === String(selectedStaff).trim();
+        const rowMonth = normalizeMonth(r.month);
+        const matchMonth = !selectedMonth || rowMonth === selectedMonth;
+        return matchStaff && matchMonth;
+    });
+
+    filtered.sort((a,b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+
+    const statStaffElem = document.getElementById("statStaff");
+    const statPayrollElem = document.getElementById("statPayroll");
+    const statNetElem = document.getElementById("statNet");
+    const statMonthElem = document.getElementById("statMonth");
+
+    if (selectedStaff || selectedMonth) {
+        let uniqueStaffIds = new Set(filtered.map(r => String(r.staffId).trim()));
+        let totalNetFiltered = filtered.reduce((sum, r) => sum + Number(r.net || 0), 0);
+
+        if (statStaffElem) statStaffElem.textContent = selectedStaff ? (filtered.length > 0 ? 1 : 0) : uniqueStaffIds.size;
+        if (statPayrollElem) statPayrollElem.textContent = filtered.length;
+        if (statNetElem) statNetElem.textContent = money(totalNetFiltered);
+        if (statMonthElem) statMonthElem.textContent = selectedMonth ? formatMonth(selectedMonth) : "Filtered";
+    } else {
+        if (statStaffElem) statStaffElem.textContent = staff.length;
+        if (statPayrollElem) statPayrollElem.textContent = payroll.length;
+        const totalNetAll = payroll.reduce((sum, r) => sum + Number(r.net || 0), 0);
+        if (statNetElem) statNetElem.textContent = money(totalNetAll);
+
+        let latestMonth = "";
+        payroll.forEach(r => {
+            const m = normalizeMonth(r.month);
+            if(m && (!latestMonth || m > latestMonth)) latestMonth = m;
+        });
+        if (statMonthElem) statMonthElem.textContent = latestMonth ? formatMonth(latestMonth) : "-";
+    }
+
+    if(filtered.length === 0) {
+        table.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod gaji dijumpai.</td></tr>`;
+        return;
+    }
+
+    table.innerHTML = filtered.slice(0, 10).map((r, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(formatMonth(r.month))}</td>
+            <td>${escapeHtml(r.name || "-")}</td>
+            <td>${escapeHtml(r.position || "-")}</td>
+            <td><strong>${money(r.net)}</strong></td>
+            <td style="max-width:200px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(r.notes || "-")}</td>
+            <td>
+                <button class="btn-small btn-edit" onclick="editPayroll('${escapeJs(r.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="btn-small btn-slip" onclick="showPayslip('${escapeJs(r.id)}')"><i class="fa-solid fa-file-invoice"></i> Slip</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function clearDashboardFilter() {
+    if(document.getElementById("dashSearchStaff")) document.getElementById("dashSearchStaff").value = "";
+    if(document.getElementById("dashMonth")) document.getElementById("dashMonth").value = "";
+    renderDashboardPayroll();
+}
+
+function populateStaffSelect() {
+    const selects = [document.getElementById("payStaff")];
+    selects.forEach(select => {
+        if(!select) return;
+        const current = select.value;
+        select.innerHTML = `<option value="">-- Pilih Staf --</option>`;
+        staff.forEach(s => {
+            const option = document.createElement("option");
+            option.value = s.id;
+            option.textContent = `${s.name || "-"}${s.ic ? " - " + s.ic : ""}`;
+            select.appendChild(option);
+        });
+        if(current) select.value = current;
+    });
+}
+
+function populateFilterSelects() {
+    const dashSelect = document.getElementById("dashSearchStaff");
+    const historySelect = document.getElementById("historySearchStaff");
+
+    let optionsHtml = `<option value="">-- Semua Staf --</option>`;
+    staff.forEach(s => {
+        optionsHtml += `<option value="${s.id}">${s.name || "-"}</option>`;
+    });
+
+    if(dashSelect) dashSelect.innerHTML = optionsHtml;
+    if(historySelect) historySelect.innerHTML = optionsHtml;
+}
+
+function staffSelected() {
+    const id = document.getElementById("payStaff").value;
+    const s = staff.find(x => String(x.id).trim() === String(id).trim());
+
+    if(!s) {
+        document.getElementById("payIC").value = "";
+        document.getElementById("payPosition").value = "";
+        document.getElementById("salary").value = "";
+        calculatePayroll();
+        return;
+    }
+    document.getElementById("payIC").value = s.ic || "";
+    document.getElementById("payPosition").value = s.position || "";
+    document.getElementById("salary").value = Number(s.salary || 0);
+    calculatePayroll();
+}
+
+function calculatePayroll() {
+    const salary = num("salary");
+    const daily = salary / 26;
+    const hourly = salary / 26 / 8;
+    const hours = num("otHours");
+    let otRate = num("otRate");
+    if(!otRate || otRate <= 0) otRate = hourly;
+
+    const ot = hours * otRate;
+    const bonus = num("bonus");
+    const allowance = num("allowance");
+    const unpaidDays = num("unpaidDays");
+    const unpaid = unpaidDays * daily;
+    const advance = num("advance");
+    const other = num("otherDeduction");
+
+    const gross = salary + ot + bonus + allowance;
+    const deductions = unpaid + advance + other;
+    const net = gross - deductions;
+
+    document.getElementById("dailyRate").value = daily.toFixed(2);
+    document.getElementById("hourlyRate").value = hourly.toFixed(2);
+    document.getElementById("otTotal").value = ot.toFixed(2);
+    document.getElementById("unpaidTotal").value = unpaid.toFixed(2);
+
+    document.getElementById("summaryOT").textContent = money(ot);
+    document.getElementById("summaryBonus").textContent = money(bonus);
+    document.getElementById("summaryAllowance").textContent = money(allowance);
+    document.getElementById("summaryGross").textContent = money(gross);
+    document.getElementById("deductionTotal").textContent = money(deductions);
+    document.getElementById("netSalary").textContent = money(net);
+}
+
+async function savePayroll() {
+    calculatePayroll();
+    const staffId = document.getElementById("payStaff").value;
+    const staffRecord = staff.find(s => String(s.id).trim() === String(staffId).trim());
+
+    if(!staffRecord) {
+        showToast("Sila pilih staf terlebih dahulu.", "error");
+        return;
+    }
+
+    const data = {
+        id: editingPayrollId || "",
+        month: document.getElementById("payMonth").value,
+        staffId: staffId,
+        name: document.getElementById("payStaff").selectedOptions[0]?.textContent.split(" - ")[0] || staffRecord.name || "",
+        ic: document.getElementById("payIC").value,
+        position: document.getElementById("payPosition").value,
+        salary: num("salary"),
+        daily: num("dailyRate"),
+        hourly: num("hourlyRate"),
+        hours: num("otHours"),
+        otRate: num("otRate") || num("hourlyRate"),
+        ot: num("otTotal"),
+        bonus: num("bonus"),
+        allowance: num("allowance"),
+        unpaidDays: num("unpaidDays"),
+        unpaid: num("unpaidTotal"),
+        advance: num("advance"),
+        other: num("otherDeduction"),
+        notes: document.getElementById("payNotes").value.trim(),
+        gross: calculateValue("gross"),
+        deductions: calculateValue("deductions"),
+        net: calculateValue("net")
+    };
+
+    if(!data.month) {
+        showToast("Sila pilih bulan gaji.", "error");
+        return;
+    }
+
+    try {
+        const result = await api("savePayroll", { data });
+        showToast(result.message || "Rekod gaji berjaya disimpan.", "success");
+
+        await loadAllData();
+        renderHistory();
+
+        const savedId = result.id;
+        resetPayrollForm();
+
+        if(savedId) {
+            setTimeout(() => showPayslip(savedId), 300);
+        }
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+function calculateValue(type) {
+    const salary = num("salary");
+    const ot = num("otTotal");
+    const bonus = num("bonus");
+    const allowance = num("allowance");
+    const unpaid = num("unpaidTotal");
+    const advance = num("advance");
+    const other = num("otherDeduction");
+
+    if(type === "gross") return salary + ot + bonus + allowance;
+    if(type === "deductions") return unpaid + advance + other;
+    if(type === "net") return salary + ot + bonus + allowance - unpaid - advance - other;
+    return 0;
+}
+
+function resetPayrollForm() {
+    editingPayrollId = null;
+    const label = document.getElementById("editModeLabel");
+    if(label) label.classList.remove("show");
+
+    document.getElementById("payStaff").value = "";
+    document.getElementById("payMonth").value = getCurrentMonth();
+    document.getElementById("payIC").value = "";
+    document.getElementById("payPosition").value = "";
+    document.getElementById("salary").value = "";
+    document.getElementById("dailyRate").value = "";
+    document.getElementById("hourlyRate").value = "";
+    document.getElementById("otHours").value = 0;
+    document.getElementById("otRate").value = 0;
+    document.getElementById("otTotal").value = 0;
+    document.getElementById("bonus").value = 0;
+    document.getElementById("allowance").value = 0;
+    document.getElementById("unpaidDays").value = 0;
+    document.getElementById("unpaidTotal").value = 0;
+    document.getElementById("advance").value = 0;
+    document.getElementById("otherDeduction").value = 0;
+    document.getElementById("payNotes").value = "";
+
+    calculatePayroll();
+}
+
+function editPayroll(id) {
+    if(!id) return;
+    const searchId = String(id).trim();
+    const r = payroll.find(x => String(x.id || "").trim() === searchId);
+
+    if(!r) {
+        showToast("Rekod gaji tidak dijumpai.", "error");
+        return;
+    }
+
+    editingPayrollId = r.id;
+    showPage("payroll", null);
+
+    document.getElementById("editModeLabel").classList.add("show");
+    document.getElementById("payStaff").value = r.staffId;
+    document.getElementById("payMonth").value = normalizeMonth(r.month);
+    document.getElementById("payIC").value = r.ic || "";
+    document.getElementById("payPosition").value = r.position || "";
+    document.getElementById("salary").value = r.salary || 0;
+    document.getElementById("otHours").value = r.hours || 0;
+    document.getElementById("otRate").value = r.otRate || 0;
+    document.getElementById("bonus").value = r.bonus || 0;
+    document.getElementById("allowance").value = r.allowance || 0;
+    document.getElementById("unpaidDays").value = r.unpaidDays || 0;
+    document.getElementById("advance").value = r.advance || 0;
+    document.getElementById("otherDeduction").value = r.other || 0;
+    document.getElementById("payNotes").value = r.notes || "";
+
+    calculatePayroll();
+}
+
+async function deletePayroll(id) {
+    const searchId = String(id).trim();
+    const r = payroll.find(x => String(x.id || "").trim() === searchId);
+    if(!r) {
+        showToast("Rekod tidak dijumpai.", "error");
+        return;
+    }
+
+    if(!confirm(`Padam rekod gaji ${r.name || ""} bagi ${formatMonth(r.month)}?`)) return;
+
+    try {
+        const result = await api("deletePayroll", { id });
+        showToast(result.message || "Rekod gaji berjaya dipadam.", "success");
+        await loadAllData();
+        showPage("history", null);
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+/* =========================================================
+   EXCEL GRID ATTENDANCE SYSTEM WITH COPY-PASTE SUPPORT
+========================================================= */
+function setActiveStatus(status) {
+    selectedStatusMode = status;
+    const label = document.getElementById("activeStatusLabel");
+    if(status === 'Clear') label.textContent = "Aktif: PADAM STATUS";
+    else if(status === 'EDIT') label.textContent = "Aktif: EDIT MASA / TEKS";
+    else label.textContent = "Aktif: MOD WARNA [" + status + "]";
+}
+
+function handleCellClick(cell) {
+    if(selectedStatusMode === 'CLEAR' || selectedStatusMode === 'EDIT') return;
+
+    cell.className = "att-cell-editable";
+
+    if(selectedStatusMode === 'MC') {
+        cell.classList.add("status-mc");
+        cell.innerText = "MC";
+    } else if(selectedStatusMode === 'Off') {
+        cell.classList.add("status-off");
+        cell.innerText = "H/day";
+    } else if(selectedStatusMode === 'Public') {
+        cell.classList.add("status-public");
+        cell.innerText = "CUTI";
+    } else if(selectedStatusMode === 'EL') {
+        cell.classList.add("status-el");
+        cell.innerText = "EL";
+    } else if(selectedStatusMode === 'CTG') {
+        cell.classList.add("status-ctg");
+        cell.innerText = "CTG";
+    } else if(selectedStatusMode === 'Grey') {
+        cell.classList.add("status-grey");
+        cell.innerText = "null";
+    } else if(selectedStatusMode === 'Clear') {
+        cell.innerText = "";
+    }
+}
+
+/* SO KOD BAHARU: MEMBOLEHKAN PASTE DARIPADA EXCEL DIRECT KE GRID */
+function handleGridPaste(e) {
+    const activeEl = document.activeElement;
+    if (!activeEl || !activeEl.classList.contains("att-cell-editable")) return;
+
+    e.preventDefault();
+    const clipboardData = (e.clipboardData || window.clipboardData).getData('text');
+    if (!clipboardData) return;
+
+    const rows = clipboardData.split(/\r\n|\n|\r/);
+    if (rows.length > 0 && rows[rows.length - 1] === "") rows.pop();
+
+    const startTr = activeEl.closest('tr');
+    const tbody = startTr.parentElement;
+    const trList = Array.from(tbody.children);
+    const startRowIdx = trList.indexOf(startTr);
+
+    const tdList = Array.from(startTr.children);
+    const startColIdx = tdList.indexOf(activeEl);
+
+    rows.forEach((rowText, rOffset) => {
+        const targetRow = trList[startRowIdx + rOffset];
+        if (!targetRow) return;
+
+        const cols = rowText.split('\t');
+        const targetTds = Array.from(targetRow.children);
+
+        cols.forEach((colText, cOffset) => {
+            const targetCell = targetTds[startColIdx + cOffset];
+            if (targetCell && targetCell.classList.contains("att-cell-editable")) {
+                const val = colText.trim();
+                targetCell.innerText = val;
+
+                // Auto-kemaskini status/warna jika teks padan
+                targetCell.className = "att-cell-editable";
+                if (val === "MC") targetCell.classList.add("status-mc");
+                else if (val === "H/day") targetCell.classList.add("status-off");
+                else if (val === "CUTI") targetCell.classList.add("status-public");
+                else if (val === "EL") targetCell.classList.add("status-el");
+                else if (val === "CTG") targetCell.classList.add("status-ctg");
+                else if (val === "null") targetCell.classList.add("status-grey");
+            }
+        });
+    });
+}
+
+function renderAttendanceGrid() {
+    const tbody = document.getElementById("attGridBody");
+    if(!tbody) return;
+
+    const currentMonth = document.getElementById("attMonthFilter")?.value || getCurrentMonth();
+    let html = "";
+
+    const monthPayrollRecords = payroll.filter(r => normalizeMonth(r.month) === currentMonth);
+    const monthAttendanceRecords = attendance.filter(a => normalizeMonth(a.date) === currentMonth);
+
+    const activeStaffIds = new Set([
+        ...monthPayrollRecords.map(r => String(r.staffId).trim()),
+        ...monthAttendanceRecords.map(a => String(a.staffId).trim())
+    ]);
+
+    let targetStaffList = [];
+    if (activeStaffIds.size > 0) {
+        targetStaffList = staff.filter(s => activeStaffIds.has(String(s.id).trim()));
+        
+        activeStaffIds.forEach(id => {
+            if (!targetStaffList.some(s => String(s.id).trim() === id)) {
+                const p = monthPayrollRecords.find(r => String(r.staffId).trim() === id);
+                const a = monthAttendanceRecords.find(att => String(att.staffId).trim() === id);
+                targetStaffList.push({
+                    id: id,
+                    name: (p ? p.name : (a ? a.name : "Staf " + id)),
+                    position: p ? p.position : "Not Set"
+                });
+            }
+        });
+    } else {
+        targetStaffList = [...staff];
+    }
+
+    if(targetStaffList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="31" style="padding:20px; color:var(--text-light);">Tiada rekod staf bagi bulan ${formatMonth(currentMonth)}.</td></tr>`;
+        return;
+    }
+
+    targetStaffList.forEach(s => {
+        const logs = attendance.filter(a => String(a.staffId).trim() === String(s.id).trim() && normalizeMonth(a.date) === currentMonth);
+
+        html += `<tr>`;
+        for(let d=1; d<=31; d++) {
+            html += `<th class="att-header-cyan">${d}</th>`;
+        }
+        html += `</tr>`;
+
+        html += `
+            <tr class="att-header-cyan">
+                <td colspan="2" style="text-align:left; padding-left:4px;">ID : ${s.id}</td>
+                <td colspan="12" style="text-align:left; padding-left:4px;">Name : ${escapeHtml(s.name)}</td>
+                <td colspan="17" style="text-align:left; padding-left:4px;">Dept. : Not Set1</td>
+            </tr>
+        `;
+
+        html += `<tr>`;
+        for(let d=1; d<=31; d++) {
+            const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
+            const log = logs.find(a => a.date === dateStr);
+            let cls = "att-cell-editable";
+            let val = log ? (log.checkIn || "") : "";
+
+            if(log) {
+                if(log.status === "MC" || val === "MC") cls += " status-mc", val="MC";
+                else if(log.status === "Off" || val === "H/day") cls += " status-off", val="H/day";
+                else if(log.status === "Public" || val === "CUTI") cls += " status-public", val="CUTI";
+                else if(log.status === "EL" || val === "EL") cls += " status-el", val="EL";
+                else if(log.status === "CTG" || val === "CTG") cls += " status-ctg", val="CTG";
+                else if(log.status === "Grey" || val === "null") cls += " status-grey", val="null";
+            }
+
+            html += `<td class="${cls}" contenteditable="true" data-staffid="${s.id}" data-date="${dateStr}" data-type="in" onclick="handleCellClick(this)">${val}</td>`;
+        }
+        html += `</tr>`;
+
+        html += `<tr>`;
+        for(let d=1; d<=31; d++) {
+            const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
+            const log = logs.find(a => a.date === dateStr);
+            let val = log ? (log.checkOut || "") : "";
+
+            html += `<td class="att-cell-editable" contenteditable="true" data-staffid="${s.id}" data-date="${dateStr}" data-type="out" onclick="handleCellClick(this)">${val}</td>`;
+        }
+        html += `</tr>`;
+
+        html += `<tr>${'<td></td>'.repeat(31)}</tr>`;
+
+        html += `<tr>`;
+        for(let d=1; d<=31; d++) {
+            const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
+            const log = logs.find(a => a.date === dateStr);
+            let val = (log && Number(log.otHours) > 0) ? log.otHours : "";
+
+            html += `<td class="att-cell-editable" contenteditable="true" style="font-weight:bold;" data-staffid="${s.id}" data-date="${dateStr}" data-type="ot">${val}</td>`;
+        }
+        html += `</tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+async function saveGridChanges() {
+    const cells = document.querySelectorAll("#attGridBody td[data-staffid]");
+    const recordsMap = {};
+
+    cells.forEach(cell => {
+        const staffId = cell.getAttribute("data-staffid");
+        const date = cell.getAttribute("data-date");
+        const type = cell.getAttribute("data-type");
+        const text = cell.innerText.trim();
+
+        const key = `${staffId}_${date}`;
+        if(!recordsMap[key]) {
+            const s = staff.find(x => String(x.id) === String(staffId));
+            const existing = attendance.find(a => String(a.staffId) === String(staffId) && a.date === date);
+
+            recordsMap[key] = {
+                id: existing ? existing.id : "",
+                staffId: staffId,
+                name: s ? s.name : "",
+                date: date,
+                checkIn: existing ? existing.checkIn : "",
+                checkOut: existing ? existing.checkOut : "",
+                otHours: existing ? existing.otHours : 0,
+                status: existing ? existing.status : "Hadir"
+            };
+        }
+
+        if(cell.classList.contains("status-mc") || text === "MC") {
+            recordsMap[key].status = "MC";
+            recordsMap[key].checkIn = "MC";
+        } else if(cell.classList.contains("status-off") || text === "H/day") {
+            recordsMap[key].status = "Off";
+            recordsMap[key].checkIn = "H/day";
+        } else if(cell.classList.contains("status-public") || text === "CUTI") {
+            recordsMap[key].status = "Public";
+            recordsMap[key].checkIn = "CUTI";
+        } else if(cell.classList.contains("status-el") || text === "EL") {
+            recordsMap[key].status = "EL";
+            recordsMap[key].checkIn = "EL";
+        } else if(cell.classList.contains("status-ctg") || text === "CTG") {
+            recordsMap[key].status = "CTG";
+            recordsMap[key].checkIn = "CTG";
+        } else if(cell.classList.contains("status-grey") || text === "null") {
+            recordsMap[key].status = "Grey";
+            recordsMap[key].checkIn = "null";
+        } else if(type === "in") {
+            recordsMap[key].status = text ? "Hadir" : "Clear";
+            recordsMap[key].checkIn = text;
+        }
+
+        if(type === "out") {
+            recordsMap[key].checkOut = text;
+        } else if(type === "ot") {
+            recordsMap[key].otHours = Number(text || 0);
+        }
+    });
+
+    const bulkData = [];
+    for(let key in recordsMap) {
+        const data = recordsMap[key];
+        if(data.checkIn || data.checkOut || data.otHours > 0 || data.status !== "Hadir") {
+            bulkData.push(data);
+        }
+    }
+
+    if(bulkData.length === 0) {
+        showToast("Tiada data diisi untuk disimpan.", "error");
+        return;
+    }
+
+    try {
+        showLoading("Menyimpan semua rekod grid...");
+        const res = await api("saveAttendanceBulk", { data: bulkData });
+        showToast(res.message || "Grid Kehadiran berjaya disimpan!", "success");
+        await loadAllData();
+    } catch(err) {
+        showToast(err.message, "error");
+    } finally {
+        hideLoading();
+    }
+}
+
+async function addStaff() {
+    const data = {
+        id: editingStaffId || "",
+        name: document.getElementById("staffName").value.trim(),
+        ic: document.getElementById("staffIC").value.trim(),
+        position: document.getElementById("staffPosition").value.trim(),
+        salary: num("staffSalary"),
+        bankName: document.getElementById("staffBankName").value.trim(),
+        bankAccount: document.getElementById("staffBankAccount").value.trim(),
+        notes: document.getElementById("staffNotes").value.trim()
+    };
+
+    if(!data.name) {
+        showToast("Sila masukkan nama staf.", "error");
+        return;
+    }
+
+    try {
+        const result = await api("saveStaff", { data });
+        showToast(result.message || "Staf berjaya disimpan.", "success");
+        cancelStaffEdit();
+        await loadAllData();
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+function editStaff(id) {
+    const searchId = String(id).trim();
+    const s = staff.find(x => String(x.id || "").trim() === searchId);
+    if(!s) {
+        showToast("Staf tidak dijumpai.", "error");
+        return;
+    }
+
+    editingStaffId = s.id;
+    document.getElementById("staffName").value = s.name || "";
+    document.getElementById("staffIC").value = s.ic || "";
+    document.getElementById("staffPosition").value = s.position || "";
+    document.getElementById("staffSalary").value = s.salary || 0;
+    document.getElementById("staffBankName").value = s.bankName || "";
+    document.getElementById("staffBankAccount").value = s.bankAccount || "";
+    document.getElementById("staffNotes").value = s.notes || "";
+    document.getElementById("staffFormTitle").textContent = "Edit Staf";
+    document.getElementById("editingStaffLabel").classList.add("show");
+
+    showPage("staff", null);
+}
+
+function cancelStaffEdit() {
+    editingStaffId = null;
+    document.getElementById("staffName").value = "";
+    document.getElementById("staffIC").value = "";
+    document.getElementById("staffPosition").value = "";
+    document.getElementById("staffSalary").value = "";
+    document.getElementById("staffBankName").value = "";
+    document.getElementById("staffBankAccount").value = "";
+    document.getElementById("staffNotes").value = "";
+    document.getElementById("staffFormTitle").textContent = "Tambah Staf";
+    document.getElementById("editingStaffLabel").classList.remove("show");
+}
+
+async function deleteStaff(id) {
+    const searchId = String(id).trim();
+    const s = staff.find(x => String(x.id || "").trim() === searchId);
+    if(!s) return;
+
+    if(!confirm(`Padam staf "${s.name}"?`)) return;
+
+    try {
+        const result = await api("deleteStaff", { id });
+        showToast(result.message, "success");
+        await loadAllData();
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+function renderStaff() {
+    const table = document.getElementById("staffTable");
+    if(!table) return;
+
+    if(staff.length === 0) {
+        table.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod staf.</td></tr>`;
+        return;
+    }
+
+    table.innerHTML = staff.map((s, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td><strong>${escapeHtml(s.name || "-")}</strong></td>
+            <td>${escapeHtml(s.ic || "-")}</td>
+            <td>${escapeHtml(s.position || "-")}</td>
+            <td>${money(s.salary)}</td>
+            <td>
+                <div><strong>${escapeHtml(s.bankName || "-")}</strong></div>
+                <div style="font-size:11px; color:var(--text-light);">${escapeHtml(s.bankAccount || "-")}</div>
+            </td>
+            <td style="max-width:260px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(s.notes || "-")}</td>
+            <td>
+                <button class="btn-small btn-edit" onclick="editStaff('${escapeJs(s.id)}')"><i class="fa-solid fa-user-pen"></i> Edit</button>
+                <button class="btn-small btn-delete" onclick="deleteStaff('${escapeJs(s.id)}')"><i class="fa-solid fa-user-minus"></i> Padam</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function renderHistory() {
+    const table = document.getElementById("historyTable");
+    if(!table) return;
+
+    const selectedStaff = document.getElementById("historySearchStaff")?.value || "";
+    const selectedMonth = document.getElementById("historyMonth")?.value || "";
+
+    let filtered = payroll.filter(r => {
+        const matchStaff = !selectedStaff || String(r.staffId).trim() === String(selectedStaff).trim();
+        const rowMonth = normalizeMonth(r.month);
+        const matchMonth = !selectedMonth || rowMonth === selectedMonth;
+        return matchStaff && matchMonth;
+    });
+
+    filtered.sort((a,b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+
+    const countElement = document.getElementById("historyCount");
+    if(countElement) {
+        countElement.textContent = `Jumlah rekod dipaparkan: ${filtered.length} | Jumlah rekod gaji: ${payroll.length}`;
+    }
+
+    if(filtered.length === 0) {
+        table.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod gaji dijumpai.</td></tr>`;
+        return;
+    }
+
+    table.innerHTML = filtered.map((r, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(formatMonth(r.month))}</td>
+            <td>
+                <strong>${escapeHtml(r.name || "-")}</strong>
+                <div style="font-size:11px; color:var(--text-light); margin-top:2px;">${escapeHtml(r.ic || "")}</div>
+            </td>
+            <td>${escapeHtml(r.position || "-")}</td>
+            <td>${money(r.gross)}</td>
+            <td>${money(r.deductions)}</td>
+            <td><strong>${money(r.net)}</strong></td>
+            <td style="max-width:200px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(r.notes || "-")}</td>
+            <td>
+                <button class="btn-small btn-edit" onclick="editPayroll('${escapeJs(r.id)}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="btn-small btn-slip" onclick="showPayslip('${escapeJs(r.id)}')"><i class="fa-solid fa-file-invoice"></i> Slip</button>
+                <button class="btn-small btn-delete" onclick="deletePayroll('${escapeJs(r.id)}')"><i class="fa-solid fa-trash"></i> Padam</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function updateHistoryCount() {
+    const element = document.getElementById("historyCount");
+    if(element) {
+        element.textContent = `Jumlah rekod dipaparkan: ${payroll.length} | Jumlah rekod gaji: ${payroll.length}`;
+    }
+}
+
+function clearHistoryFilter() {
+    if(document.getElementById("historySearchStaff")) document.getElementById("historySearchStaff").value = "";
+    if(document.getElementById("historyMonth")) document.getElementById("historyMonth").value = "";
+    renderHistory();
+}
+
+function showPayslip(id) {
+    if(!id) {
+        showToast("ID rekod tidak sah.", "error");
+        return;
+    }
+    const searchId = String(id).trim();
+    const record = payroll.find(r => String(r.id || "").trim() === searchId);
+
+    if(!record) {
+        showToast("Rekod gaji tidak dijumpai.", "error");
+        return;
+    }
+
+    document.getElementById("slipCompany").textContent = settings.company || "EMPIRE DAIE EJAY COLLECTION";
+    
+    const fullAddress = settings.address || "No 2-13, 03, Jalan Medan Pusat Bandar 8, Seksyen 9, 43650 Bandar Baru Bangi, Selangor.";
+    document.getElementById("slipAddress").innerHTML = fullAddress + "<br>Tel: 011-57716165 | 016-3414452";
+    
+    document.getElementById("slipName").textContent = record.name || "-";
+    document.getElementById("slipMonth").textContent = normalizeMonth(record.month) || "-";
+    document.getElementById("slipStaffID").textContent = record.staffId ? ("EDEC-" + record.staffId.padStart(3, '0')) : "-";
+    document.getElementById("slipIC").textContent = record.ic || "-";
+    document.getElementById("slipPosition").textContent = record.position || "-";
+
+    document.getElementById("slipSalary").textContent = money(record.salary);
+    document.getElementById("slipAllowance").textContent = money(record.allowance);
+    document.getElementById("slipOtHours").textContent = record.hours || 0;
+    document.getElementById("slipOT").textContent = money(record.ot);
+    document.getElementById("slipBonus").textContent = money(record.bonus);
+
+    document.getElementById("slipAdvance").textContent = money(record.advance);
+    document.getElementById("slipUnpaidDays").textContent = record.unpaidDays || 0;
+    document.getElementById("slipUnpaid").textContent = money(record.unpaid);
+    document.getElementById("slipOther").textContent = money(record.other);
+
+    document.getElementById("slipGross").textContent = money(record.gross);
+    document.getElementById("slipDeductions").textContent = money(record.deductions);
+    document.getElementById("slipNet").textContent = money(record.net);
+    document.getElementById("slipNotes").textContent = record.notes || "-";
+
+    showPage("payslipPage", null);
+}
+
+async function importExcel() {
+    const file = document.getElementById("excelFile").files[0];
+    const resultElement = document.getElementById("importResult");
+    if(!file) {
+        showToast("Sila pilih fail Excel.", "error");
+        return;
+    }
+
+    try {
+        showLoading("Membaca fail Excel...");
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if(!rows.length) throw new Error("Fail Excel tiada data.");
+
+        let successCount = 0, failCount = 0;
+        for(const row of rows) {
+            const name = row.Nama || row.nama || row.Name || row.name || "";
+            const ic = row.IC || row.ic || row["No IC"] || row["No. IC"] || "";
+            const position = row.Jawatan || row.jawatan || row.Position || row.position || "";
+            const salary = Number(row.Gaji || row.gaji || row.Salary || row.salary || 0);
+            const bankName = row.NamaBank || row.namabank || row.Bank || row.bank || "";
+            const bankAccount = row.NoAkaun || row.noakaun || row["No Akaun"] || row.Account || "";
+            const notes = row.Catatan || row.catatan || row.Notes || row.notes || "";
+
+            if(!name) { failCount++; continue; }
+
+            try {
+                await api("saveStaff", { data: { name, ic, position, salary, bankName, bankAccount, notes } });
+                successCount++;
+            } catch(e) { failCount++; }
+        }
+
+        resultElement.innerHTML = `<div style="color:var(--success); font-weight:600;">Import selesai. Berjaya: ${successCount} | Gagal: ${failCount}</div>`;
+        await loadAllData();
+    } catch(error) {
+        resultElement.innerHTML = `<div style="color:var(--danger);">${escapeHtml(error.message)}</div>`;
+        showToast(error.message, "error");
+    } finally {
+        hideLoading();
+    }
+}
+
+async function saveSettings() {
+    const data = {
+        companyName: document.getElementById("companyName").value.trim(),
+        companyAddress: document.getElementById("companyAddress").value.trim()
+    };
+    try {
+        const result = await api("saveSettings", { data });
+        settings.company = data.companyName;
+        settings.address = data.companyAddress;
+        showToast(result.message || "Tetapan berjaya disimpan.", "success");
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+async function deleteAllData() {
+    const yes = confirm("AMARAN!\n\nSemua rekod STAF, PAYROLL dan KEHADIRAN akan dipadam.\n\nTindakan ini tidak boleh dibatalkan.\n\nTeruskan?");
+    if(!yes) return;
+    const confirmText = prompt('Taip "PADAM" untuk mengesahkan.');
+    if(confirmText !== "PADAM") {
+        showToast("Operasi dibatalkan.", "error");
+        return;
+    }
+    try {
+        const result = await api("deleteAll");
+        showToast(result.message, "success");
+        await loadAllData();
+    } catch(error) {
+        showToast(error.message, "error");
+    }
+}
+
+function num(id) {
+    const value = document.getElementById(id)?.value;
+    const number = parseFloat(value);
+    return isNaN(number) ? 0 : number;
+}
+
+function money(value) {
+    const number = Number(value || 0);
+    return "RM " + number.toLocaleString("ms-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function getCurrentMonth() {
+    const date = new Date();
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+}
+
+function getCurrentDate() {
+    const date = new Date();
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+}
+
+function normalizeMonth(value) {
+    if(!value) return "";
+    if(value instanceof Date && !isNaN(value)) {
+        return value.getFullYear() + "-" + String(value.getMonth() + 1).padStart(2, "0");
+    }
+    const str = String(value).trim();
+    if(/^\d{4}-\d{2}$/.test(str)) return str;
+    if(/^\d{4}-\d{2}-\d{2}/.test(str)) return str.substring(0, 7);
+
+    const dmy = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(dmy) return dmy[3] + "-" + String(dmy[2]).padStart(2, "0");
+
+    const date = new Date(str);
+    if(!isNaN(date)) return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+    return str;
+}
+
+function formatMonth(value) {
+    const normalized = normalizeMonth(value);
+    if(!normalized) return "-";
+    const parts = normalized.split("-");
+    if(parts.length !== 2) return normalized;
+
+    const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+    const index = parseInt(parts[1], 10) - 1;
+    return (months[index] || parts[1]) + " " + parts[0];
+}
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function escapeJs(value) {
+    return String(value ?? "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+let toastTimer;
+function showToast(message, type = "") {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "toast show " + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.className = "toast"; }, 3500);
+}
+
+function showLoading(text = "Memproses...") {
+    const loading = document.getElementById("loading");
+    const loadingText = document.getElementById("loadingText");
+    if(loadingText) loadingText.textContent = text;
+    if(loading) loading.classList.add("show");
+}
+
+function hideLoading() {
+    const loading = document.getElementById("loading");
+    if(loading) loading.classList.remove("show");
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    checkAuth();
+    document.getElementById("payMonth").value = getCurrentMonth();
+    document.getElementById("attMonthFilter").value = getCurrentMonth();
+    document.getElementById("companyName").value = settings.company;
+
+    // MENAMBAH LISTENER KHAUS UNTUK FUNGSI PASTE DARI EXCEL
+    document.addEventListener("paste", handleGridPaste);
+
+    loadAllData();
+});
+</script>
+</body>
+</html>
