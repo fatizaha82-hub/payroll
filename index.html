@@ -472,7 +472,7 @@ tbody tr:hover{ background: #f1f5f9; }
     background: #fff;
     border: 2px solid #000;
     font-family: Arial, sans-serif;
-    user-select: text; /* MEMBOLEHKAN HIGHLIGHT TEKS DENGAN MOUSE */
+    user-select: text;
     -webkit-user-select: text;
 }
 
@@ -776,10 +776,15 @@ tbody tr:hover{ background: #f1f5f9; }
                     <div class="form-group"><label>Jumlah OT (RM)</label><input type="number" id="otTotal" readonly></div>
                 </div>
 
-                <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--gold-dark);"><i class="fa-solid fa-gift"></i> Tambahan</h3>
+                <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--gold-dark);"><i class="fa-solid fa-gift"></i> Tambahan & Pendapatan Lain</h3>
                 <div class="form-grid">
                     <div class="form-group"><label>Bonus (RM)</label><input type="number" id="bonus" step="0.01" value="0" oninput="calculatePayroll()"></div>
                     <div class="form-group"><label>Elaun (RM)</label><input type="number" id="allowance" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                </div>
+                <!-- BAHAGIAN BAHARU: PENDAPATAN LAIN/BAKI GAJI -->
+                <div class="form-grid">
+                    <div class="form-group"><label>Pendapatan Lain / Baki Gaji Bulan Lepas (RM)</label><input type="number" id="otherIncome" step="0.01" value="0" oninput="calculatePayroll()"></div>
+                    <div class="form-group"><label>Teks / Penerangan Pendapatan Lain</label><input type="text" id="otherIncomeLabel" placeholder="Contoh: Baki gaji bulan lepas belum bayar / Komisen" oninput="calculatePayroll()"></div>
                 </div>
 
                 <h3 style="font-size:15px; margin-top:20px; margin-bottom:12px; color:var(--danger);"><i class="fa-solid fa-scissors"></i> Potongan</h3>
@@ -801,6 +806,7 @@ tbody tr:hover{ background: #f1f5f9; }
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Jumlah OT</span><strong id="summaryOT">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Bonus</span><strong id="summaryBonus">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Elaun</span><strong id="summaryAllowance">RM 0.00</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span id="summaryOtherIncomeLabelText">Pendapatan Lain</span><strong id="summaryOtherIncome">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Gaji Kasar</span><strong id="summaryGross">RM 0.00</strong></div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Jumlah Potongan</span><strong id="deductionTotal">RM 0.00</strong></div>
                     <hr style="margin:8px 0; border:0; border-top:1px dashed var(--border);">
@@ -1031,6 +1037,13 @@ tbody tr:hover{ background: #f1f5f9; }
                                 <td style="padding-left:10px;"></td>
                                 <td></td>
                             </tr>
+                            <!-- BARIS BAHARU PADA SLIP GAJI FOR PENDAPATAN LAIN -->
+                            <tr>
+                                <td id="slipOtherIncomeLabel">Pendapatan Lain / Baki Gaji</td>
+                                <td class="amount" id="slipOtherIncome">RM 0.00</td>
+                                <td style="padding-left:10px;"></td>
+                                <td></td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -1243,6 +1256,8 @@ function normalizePayroll(rows) {
             ot: Number(findVal("jumlahot", "ot") || 0),
             bonus: Number(findVal("bonus") || 0),
             allowance: Number(findVal("elaun", "allowance") || 0),
+            otherIncome: Number(findVal("pendapatanlain", "otherincome") || 0),
+            otherIncomeLabel: findVal("tekspendapatanlain", "otherincomelabel") || "Pendapatan Lain",
             unpaidDays: Number(findVal("haricutitanpagaji", "unpaiddays") || 0),
             unpaid: Number(findVal("jumlahcutitanpagaji", "unpaid") || 0),
             advance: Number(findVal("advance") || 0),
@@ -1432,12 +1447,15 @@ function calculatePayroll() {
     const ot = hours * otRate;
     const bonus = num("bonus");
     const allowance = num("allowance");
+    const otherInc = num("otherIncome");
+    const otherIncLabel = document.getElementById("otherIncomeLabel")?.value.trim() || "Pendapatan Lain";
+
     const unpaidDays = num("unpaidDays");
     const unpaid = unpaidDays * daily;
     const advance = num("advance");
     const other = num("otherDeduction");
 
-    const gross = salary + ot + bonus + allowance;
+    const gross = salary + ot + bonus + allowance + otherInc;
     const deductions = unpaid + advance + other;
     const net = gross - deductions;
 
@@ -1449,6 +1467,9 @@ function calculatePayroll() {
     document.getElementById("summaryOT").textContent = money(ot);
     document.getElementById("summaryBonus").textContent = money(bonus);
     document.getElementById("summaryAllowance").textContent = money(allowance);
+    document.getElementById("summaryOtherIncome").textContent = money(otherInc);
+    document.getElementById("summaryOtherIncomeLabelText").textContent = otherIncLabel;
+
     document.getElementById("summaryGross").textContent = money(gross);
     document.getElementById("deductionTotal").textContent = money(deductions);
     document.getElementById("netSalary").textContent = money(net);
@@ -1479,6 +1500,8 @@ async function savePayroll() {
         ot: num("otTotal"),
         bonus: num("bonus"),
         allowance: num("allowance"),
+        otherIncome: num("otherIncome"),
+        otherIncomeLabel: document.getElementById("otherIncomeLabel").value.trim() || "Pendapatan Lain",
         unpaidDays: num("unpaidDays"),
         unpaid: num("unpaidTotal"),
         advance: num("advance"),
@@ -1517,13 +1540,14 @@ function calculateValue(type) {
     const ot = num("otTotal");
     const bonus = num("bonus");
     const allowance = num("allowance");
+    const otherInc = num("otherIncome");
     const unpaid = num("unpaidTotal");
     const advance = num("advance");
     const other = num("otherDeduction");
 
-    if(type === "gross") return salary + ot + bonus + allowance;
+    if(type === "gross") return salary + ot + bonus + allowance + otherInc;
     if(type === "deductions") return unpaid + advance + other;
-    if(type === "net") return salary + ot + bonus + allowance - unpaid - advance - other;
+    if(type === "net") return salary + ot + bonus + allowance + otherInc - unpaid - advance - other;
     return 0;
 }
 
@@ -1544,6 +1568,8 @@ function resetPayrollForm() {
     document.getElementById("otTotal").value = 0;
     document.getElementById("bonus").value = 0;
     document.getElementById("allowance").value = 0;
+    document.getElementById("otherIncome").value = 0;
+    document.getElementById("otherIncomeLabel").value = "";
     document.getElementById("unpaidDays").value = 0;
     document.getElementById("unpaidTotal").value = 0;
     document.getElementById("advance").value = 0;
@@ -1576,6 +1602,8 @@ function editPayroll(id) {
     document.getElementById("otRate").value = r.otRate || 0;
     document.getElementById("bonus").value = r.bonus || 0;
     document.getElementById("allowance").value = r.allowance || 0;
+    document.getElementById("otherIncome").value = r.otherIncome || 0;
+    document.getElementById("otherIncomeLabel").value = r.otherIncomeLabel || "";
     document.getElementById("unpaidDays").value = r.unpaidDays || 0;
     document.getElementById("advance").value = r.advance || 0;
     document.getElementById("otherDeduction").value = r.other || 0;
@@ -1615,9 +1643,8 @@ function setActiveStatus(status) {
     else label.textContent = "Aktif: MOD WARNA [" + status + "]";
 }
 
-/* PEMBAIKAN: JIKA DALAM MOD EDIT, BENARKAN MOUSE HIGHLIGHT BIASA TANPA MENGGANGGU */
 function handleCellClick(cell) {
-    if(selectedStatusMode === 'EDIT') return; // Membolehkan highlight teks/sel biasa
+    if(selectedStatusMode === 'EDIT') return;
 
     cell.className = "att-cell-editable";
 
@@ -2069,6 +2096,9 @@ function showPayslip(id) {
     document.getElementById("slipOtHours").textContent = record.hours || 0;
     document.getElementById("slipOT").textContent = money(record.ot);
     document.getElementById("slipBonus").textContent = money(record.bonus);
+
+    document.getElementById("slipOtherIncomeLabel").textContent = record.otherIncomeLabel || "Pendapatan Lain / Baki Gaji";
+    document.getElementById("slipOtherIncome").textContent = money(record.otherIncome);
 
     document.getElementById("slipAdvance").textContent = money(record.advance);
     document.getElementById("slipUnpaidDays").textContent = record.unpaidDays || 0;
