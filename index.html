@@ -20,7 +20,7 @@
     --primary-light: #ccfbf1;    /* Light Turquoise Soft */
     --primary-bg: #f0fdf4;       /* Subtle Turquoise/Green Tint Background */
     
-    --gold: #d97706;             /* Base Gold */
+    --gold: #d97706;              /* Base Gold */
     --gold-dark: #b45309;        /* Dark Metallic Gold */
     --gold-light: #fef3c7;       /* Light Soft Gold */
     --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); /* Metallic Gold Gradient */
@@ -866,7 +866,12 @@ tbody tr:hover{ background: #f1f5f9; }
                     <div class="form-group"><label>No. IC</label><input type="text" id="staffIC" placeholder="Contoh: 900101-01-1234"></div>
                     <div class="form-group"><label>Jawatan</label><input type="text" id="staffPosition" placeholder="Jawatan"></div>
                     <div class="form-group"><label>Gaji Bulanan (RM)</label><input type="number" id="staffSalary" step="0.01" min="0"></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>Catatan Staf (Status Berkhidmat / Baharu / Berhenti)</label><textarea id="staffNotes" rows="3" placeholder="Contoh: Mula berkhidmat 01/02/2026 atau Berhenti 30/09/2026"></textarea></div>
+                    
+                    <!-- DUA MEDAN BAHARU UNTUK AKAUN BANK -->
+                    <div class="form-group"><label><i class="fa-solid fa-building-columns"></i> Nama Bank</label><input type="text" id="staffBankName" placeholder="Contoh: Maybank / CIMB"></div>
+                    <div class="form-group"><label><i class="fa-solid fa-credit-card"></i> No. Akaun Bank</label><input type="text" id="staffBankAccount" placeholder="Contoh: 162345678901"></div>
+
+                    <div class="form-group" style="grid-column: span 3;"><label>Catatan Staf (Status Berkhidmat / Baharu / Berhenti)</label><textarea id="staffNotes" rows="3" placeholder="Contoh: Mula berkhidmat 01/02/2026 atau Berhenti 30/09/2026"></textarea></div>
                 </div>
                 <div class="btn-row">
                     <button class="btn btn-gold" id="staffSaveBtn" onclick="addStaff()"><i class="fa-solid fa-user-plus"></i> Simpan Staf</button>
@@ -878,7 +883,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <h3 style="font-size:16px; margin-bottom:16px;">Senarai Staf Berdaftar</h3>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>Bil</th><th>Nama</th><th>IC</th><th>Jawatan</th><th>Gaji (RM)</th><th>Catatan</th><th>Tindakan</th></tr></thead>
+                        <thead><tr><th>Bil</th><th>Nama</th><th>IC</th><th>Jawatan</th><th>Gaji (RM)</th><th>Maklumat Bank</th><th>Catatan</th><th>Tindakan</th></tr></thead>
                         <tbody id="staffTable"></tbody>
                     </table>
                 </div>
@@ -919,7 +924,7 @@ tbody tr:hover{ background: #f1f5f9; }
                 <div class="import-box" style="text-align:center; padding:20px;">
                     <i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; color:var(--gold-dark); margin-bottom:12px;"></i>
                     <h3>Pilih Fail Excel</h3>
-                    <p style="color:var(--text-light); font-size:13px; margin-top:4px;">Pastikan kolum mengandungi: <b>Nama, IC, Jawatan, Gaji</b></p>
+                    <p style="color:var(--text-light); font-size:13px; margin-top:4px;">Pastikan kolum mengandungi: <b>Nama, IC, Jawatan, Gaji, NamaBank, NoAkaun</b></p>
                     <input type="file" id="excelFile" accept=".xlsx,.xls" style="margin-top:20px; max-width:360px;">
                     <div class="btn-row" style="justify-content:center;">
                         <button class="btn btn-gold" onclick="importExcel()"><i class="fa-solid fa-file-import"></i> Mulakan Import</button>
@@ -1198,6 +1203,8 @@ function normalizeStaff(rows) {
             ic: findVal("ic"),
             position: findVal("jawatan", "position"),
             salary: Number(findVal("gaji", "salary") || 0),
+            bankName: findVal("namabank", "bankname"),
+            bankAccount: findVal("noakaun", "bankaccount"),
             notes: findVal("catatan", "notes"),
             createdAt: findVal("createdat"),
             updatedAt: findVal("updatedat")
@@ -1310,7 +1317,6 @@ function renderDashboardPayroll() {
 
     filtered.sort((a,b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
 
-    // KEMASKINI STATS BOX DI ATAS BERDASARKAN FILTER/DATA TERPILIH
     const statStaffElem = document.getElementById("statStaff");
     const statPayrollElem = document.getElementById("statPayroll");
     const statNetElem = document.getElementById("statNet");
@@ -1627,7 +1633,7 @@ function handleCellClick(cell) {
         cell.innerText = "CTG";
     } else if(selectedStatusMode === 'Grey') {
         cell.classList.add("status-grey");
-        cell.innerText = "null"; // LANGSUNG MELETAKKAN TEKS "null" DI SEL PADA WAKTU KLIK
+        cell.innerText = "null";
     } else if(selectedStatusMode === 'Clear') {
         cell.innerText = "";
     }
@@ -1675,14 +1681,12 @@ function renderAttendanceGrid() {
     targetStaffList.forEach(s => {
         const logs = attendance.filter(a => String(a.staffId).trim() === String(s.id).trim() && normalizeMonth(a.date) === currentMonth);
 
-        // Header 1 - 31 ATAS Setiap Nama Staf
         html += `<tr>`;
         for(let d=1; d<=31; d++) {
             html += `<th class="att-header-cyan">${d}</th>`;
         }
         html += `</tr>`;
 
-        // Baris ID / Nama / Dept
         html += `
             <tr class="att-header-cyan">
                 <td colspan="2" style="text-align:left; padding-left:4px;">ID : ${s.id}</td>
@@ -1691,7 +1695,6 @@ function renderAttendanceGrid() {
             </tr>
         `;
 
-        // Baris In
         html += `<tr>`;
         for(let d=1; d<=31; d++) {
             const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
@@ -1712,7 +1715,6 @@ function renderAttendanceGrid() {
         }
         html += `</tr>`;
 
-        // Baris Out
         html += `<tr>`;
         for(let d=1; d<=31; d++) {
             const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
@@ -1723,10 +1725,8 @@ function renderAttendanceGrid() {
         }
         html += `</tr>`;
 
-        // Baris Blank
         html += `<tr>${'<td></td>'.repeat(31)}</tr>`;
 
-        // Baris OT
         html += `<tr>`;
         for(let d=1; d<=31; d++) {
             const dateStr = `${currentMonth}-${String(d).padStart(2, '0')}`;
@@ -1741,7 +1741,6 @@ function renderAttendanceGrid() {
     tbody.innerHTML = html;
 }
 
-// SIMPAN SEMUA PERUBAHAN DARI GRID DENGAN HANYA 1 PERMINTAAN (BULK SAVE)
 async function saveGridChanges() {
     const cells = document.querySelectorAll("#attGridBody td[data-staffid]");
     const recordsMap = {};
@@ -1831,6 +1830,8 @@ async function addStaff() {
         ic: document.getElementById("staffIC").value.trim(),
         position: document.getElementById("staffPosition").value.trim(),
         salary: num("staffSalary"),
+        bankName: document.getElementById("staffBankName").value.trim(),
+        bankAccount: document.getElementById("staffBankAccount").value.trim(),
         notes: document.getElementById("staffNotes").value.trim()
     };
 
@@ -1862,6 +1863,8 @@ function editStaff(id) {
     document.getElementById("staffIC").value = s.ic || "";
     document.getElementById("staffPosition").value = s.position || "";
     document.getElementById("staffSalary").value = s.salary || 0;
+    document.getElementById("staffBankName").value = s.bankName || "";
+    document.getElementById("staffBankAccount").value = s.bankAccount || "";
     document.getElementById("staffNotes").value = s.notes || "";
     document.getElementById("staffFormTitle").textContent = "Edit Staf";
     document.getElementById("editingStaffLabel").classList.add("show");
@@ -1875,6 +1878,8 @@ function cancelStaffEdit() {
     document.getElementById("staffIC").value = "";
     document.getElementById("staffPosition").value = "";
     document.getElementById("staffSalary").value = "";
+    document.getElementById("staffBankName").value = "";
+    document.getElementById("staffBankAccount").value = "";
     document.getElementById("staffNotes").value = "";
     document.getElementById("staffFormTitle").textContent = "Tambah Staf";
     document.getElementById("editingStaffLabel").classList.remove("show");
@@ -1901,7 +1906,7 @@ function renderStaff() {
     if(!table) return;
 
     if(staff.length === 0) {
-        table.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod staf.</td></tr>`;
+        table.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-light);">Tiada rekod staf.</td></tr>`;
         return;
     }
 
@@ -1912,6 +1917,10 @@ function renderStaff() {
             <td>${escapeHtml(s.ic || "-")}</td>
             <td>${escapeHtml(s.position || "-")}</td>
             <td>${money(s.salary)}</td>
+            <td>
+                <div><strong>${escapeHtml(s.bankName || "-")}</strong></div>
+                <div style="font-size:11px; color:var(--text-light);">${escapeHtml(s.bankAccount || "-")}</div>
+            </td>
             <td style="max-width:260px; white-space:pre-wrap; font-size:12px; color:var(--text-light);">${escapeHtml(s.notes || "-")}</td>
             <td>
                 <button class="btn-small btn-edit" onclick="editStaff('${escapeJs(s.id)}')"><i class="fa-solid fa-user-pen"></i> Edit</button>
@@ -2049,12 +2058,14 @@ async function importExcel() {
             const ic = row.IC || row.ic || row["No IC"] || row["No. IC"] || "";
             const position = row.Jawatan || row.jawatan || row.Position || row.position || "";
             const salary = Number(row.Gaji || row.gaji || row.Salary || row.salary || 0);
+            const bankName = row.NamaBank || row.namabank || row.Bank || row.bank || "";
+            const bankAccount = row.NoAkaun || row.noakaun || row["No Akaun"] || row.Account || "";
             const notes = row.Catatan || row.catatan || row.Notes || row.notes || "";
 
             if(!name) { failCount++; continue; }
 
             try {
-                await api("saveStaff", { data: { name, ic, position, salary, notes } });
+                await api("saveStaff", { data: { name, ic, position, salary, bankName, bankAccount, notes } });
                 successCount++;
             } catch(e) { failCount++; }
         }
